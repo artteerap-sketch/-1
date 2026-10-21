@@ -1,0 +1,2191 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ตำนานบ้านทุ่ง — Thai Pixel MMORPG</title>
+<style>
+:root{--panel:#2d2119;--gold:#f5d18a;--edge:#9b7446;--leaf:#5caf4d}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#17251b;color:#fff;font-family:Tahoma,"Noto Sans Thai",sans-serif;touch-action:none}
+#game{position:absolute;inset:0;width:100%;image-rendering:pixelated;display:block}
+.ui{position:absolute;z-index:2;text-shadow:1px 2px #24170f;font-size:12px;pointer-events:none}
+
+#hud{top:8px;left:8px;width:150px;padding:4px;background:transparent;border:none}
+.name{font-weight:bold;color:#ffe7a3;margin-bottom:2px;font-size:12px}
+.bar{height:5px;background:#352b29aa;border:1px solid #130e0ccc;margin:1px 0 3px;overflow:hidden;border-radius:2px}
+.fill{height:100%;width:100%}
+.hp{background:#e64c45}.food{background:#f0a830}.xp{background:#e7bd42}
+
+#toprightcontainer{top:8px;right:8px;display:flex;align-items:center;gap:6px;z-index:4;pointer-events:auto}
+#timewindow{padding:6px 10px;background:linear-gradient(#443020ee,#261b15ee);border:2px solid #c69a55;border-radius:5px;font-weight:bold;color:#ffe7a3;box-shadow:0 3px #140d09}
+#savebtn{padding:6px 10px;background:#3b5c3a;border:2px solid #6cb26a;border-radius:5px;font-weight:bold;color:#fff;cursor:pointer;font-size:12px}
+#savebtn:hover{background:#4a7349}
+
+#quest{top:54px;right:8px;width:195px;padding:7px 9px;background:#30241edb;border:2px solid #a47c49;border-radius:5px;display:none;z-index:4}
+#topright{top:96px;right:8px;display:flex;gap:5px;pointer-events:auto}
+button{font: bold 12px Tahoma,sans-serif;color:#fff;background:linear-gradient(#6b4a2f,#433020);border:2px solid #c49b5e;border-radius:5px;padding:8px;box-shadow:0 2px #24170f;touch-action:manipulation}
+
+#toast{top:150px;left:8px;padding:4px 0;background:transparent;border:none;border-radius:0;max-width:260px;text-align:left;display:none;color:#ffffff;font-weight:bold;font-size:10px;box-shadow:none}
+
+#bottom{position:absolute;bottom:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:end;z-index:3;pointer-events:none}
+
+#stick{width:110px;height:110px;border-radius:50%;background:#171d1855;border:2px solid #e8d3a033;position:absolute;display:none;pointer-events:none;z-index:4}
+#nub{position:absolute;width:44px;height:44px;border-radius:50%;left:33px;top:33px;background:#d6bd8b88;border:2px solid #f5e2b9aa}
+
+#actions{display:grid;grid-template-columns:repeat(2,54px);gap:7px;pointer-events:auto}
+.action{height:48px;font-size:20px;padding:3px;background:#433326dd}
+
+#shortcutslot{position:absolute;right:8px;bottom:148px;width:54px;height:54px;background:#30231b;border:3px solid #d6ad69;border-radius:8px;z-index:4;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px #100b08;text-align:center;font-size:10px}
+#shortcutslot:hover{background:#433326}
+
+#dialog{position:absolute;z-index:5;left:8%;right:8%;bottom:155px;background:#30231b;border:3px solid #d6ad69;border-radius:6px;padding:12px;display:none;color:#fff2cf;box-shadow:0 4px #100b08}
+#dialog button{margin:5px 4px 0 0}
+
+#loginoverlay{position:absolute;inset:0;background:rgba(15,23,17,0.95);z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+.login-box{background:#30231b;border:3px solid #d6ad69;border-radius:10px;padding:20px;width:320px;text-align:center;box-shadow:0 8px #100b08}
+.login-box h2{color:#ffe7a3;margin-top:0;margin-bottom:14px;font-size:18px}
+.login-box input{width:100%;padding:10px;margin-bottom:12px;background:#231913;border:2px solid #a47c49;border-radius:5px;color:#fff;font-size:14px;text-align:center}
+.login-box button{width:100%;background:#57402b;border:2px solid #c49b5e;border-radius:5px;padding:10px;color:#fff;font-weight:bold;cursor:pointer;margin-bottom:8px}
+.login-box button:hover{background:#6d5238}
+.file-upload-login{background:#3b5c3a !important;border:2px solid #6cb26a !important;display:block;width:100%;padding:10px;border-radius:5px;text-align:center;cursor:pointer;font-weight:bold;box-sizing:border-box}
+.file-upload-login:hover{background:#4a7349 !important}
+.file-upload-login input{display:none}
+
+#levelupmenu{position:absolute;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:280px;background:#30231b;border:3px solid #d6ad69;border-radius:8px;padding:16px;display:none;box-shadow:0 6px #100b08;text-align:center}
+#levelupmenu h3{margin:0 0 8px 0;color:#ffe7a3;font-size:15px}
+.up-btn{display:block;width:100%;margin-bottom:8px;padding:10px;background:#57402b;border:2px solid #c49b5e;border-radius:5px;color:#fff;font-weight:bold;cursor:pointer;text-align:center}
+.up-btn:hover{background:#6d5238}
+
+#mapmenu{position:absolute;z-index:10;left:50%;top:50%;transform:translate(-50%,-50%);width:240px;background:#30231b;border:3px solid #d6ad69;border-radius:8px;padding:14px;display:none;box-shadow:0 6px #100b08;text-align:center}
+#mapmenu h3{margin:0 0 10px 0;color:#ffe7a3;font-size:14px}
+.map-list-btn{display:block;width:100%;margin-bottom:6px;padding:10px;background:#57402b;border:2px solid #c49b5e;border-radius:5px;color:#fff;font-weight:bold;cursor:pointer;text-align:center}
+.map-list-btn:hover{background:#6d5238}
+
+#inventory{position:absolute;z-index:10;display:none;left:5%;right:5%;top:15%;max-height:70%;overflow-y:auto;background:#30231b;border:3px solid #d6ad69;border-radius:8px;padding:14px;box-shadow:0 6px #100b08}
+#inventory h3{margin:0 0 10px 0;color:#ffe7a3;font-size:14px;text-align:center}
+#inventory .items{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.inv-slot{background:#433326;border:2px solid #a47c49;border-radius:6px;padding:8px;text-align:center;font-size:11px;display:flex;flex-direction:column;justify-content:space-between;min-height:85px}
+.inv-slot b{color:#ffe7a3;font-size:12px;margin:2px 0}
+.inv-slot button{margin-top:4px;padding:4px;font-size:10px;background:#57402b;border:1px solid #c49b5e;border-radius:4px;cursor:pointer}
+
+#shopmenu{position:absolute;z-index:10;display:none;left:4%;right:4%;top:18%;max-height:65%;overflow-y:auto;background:#30231b;border:3px solid #d6ad69;border-radius:8px;padding:14px;box-shadow:0 6px #100b08}
+#shopmenu h3{margin:0 0 10px 0;color:#ffe7a3;font-size:14px;text-align:center}
+.shop-item{background:#433326;border:2px solid #a47c49;border-radius:6px;padding:8px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.shop-item-info{display:flex;flex-direction:column;gap:2px;max-width:55%}
+.shop-item-btns{display:flex;gap:5px;align-items:center}
+.shop-item-btns button{padding:6px 10px;font-size:11px;cursor:pointer;white-space:nowrap}
+
+#fishbtn{position:absolute;right:8px;bottom:210px;width:54px;height:54px;background:#1a4d6c;border:3px solid #69b3d6;border-radius:8px;z-index:4;display:none;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px #100b08;text-align:center;font-size:10px}
+#fishbtn:hover{background:#23668f}
+
+#digbtn{position:absolute;right:8px;bottom:275px;width:54px;height:54px;background:#6d4d1a;border:3px solid #d6aa69;border-radius:8px;z-index:4;display:none;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px #100b08;text-align:center;font-size:10px}
+#digbtn:hover{background:#8f6526}
+
+@media(min-width:750px){#bottom{left:calc(50% - 350px);right:calc(50% - 350px)}#hud{width:160px}}
+</style>
+</head>
+<body>
+<div id="loginoverlay">
+ <div class="login-box">
+  <h2>🌾 เข้าสู่เกมบ้านทุ่ง</h2>
+  <input type="text" id="usernameinput" placeholder="ชื่อผู้เล่น (อย่างน้อย 4 ตัวอักษร)" maxlength="20">
+  <button id="loginbtn">เริ่มเกมใหม่</button>
+  <div style="margin: 8px 0; color: #a47c49; font-size: 11px;">— หรือ —</div>
+  <label class="file-upload-login">
+   📂 โหลดไฟล์เซฟ (.JSON)
+   <input type="file" id="savefileinput" accept=".json" onchange="loadGameFromFile(event)">
+  </label>
+ </div>
+</div>
+
+<canvas id="game"></canvas>
+<div id="hud" class="ui">
+ <div class="name">🧑‍🌾 <span id="namelabel">ผู้กล้าบ้านทุ่ง</span> <span id="lv">Lv.1</span></div>
+ <div>HP <span id="hptext">100/100</span></div><div class="bar"><div id="hpbar" class="fill hp"></div></div>
+ <div>อาหาร <span id="foodtext">100/100</span></div><div class="bar"><div id="foodbar" class="fill food"></div></div>
+ <div>EXP <span id="exptext">0/100</span></div><div class="bar"><div id="xpbar" class="fill xp"></div></div>
+ <div style="color:#f5d18a;margin-top:2px;">⚔️ ดาเมจ: <span id="dmgtext">50</span></div>
+ <div>🪙 <span id="coins">25</span> บาท</div>
+</div>
+
+<div id="toprightcontainer" class="ui">
+ <div id="timewindow">⏰ <span id="timetext">ช่วงเช้า</span></div>
+ <button id="savebtn">💾 เซฟเกม (.json)</button>
+</div>
+
+<div id="shortcutslot" title="คลิกเพื่อเลือกไอเทมลัด">
+ <span id="sc-icon" style="font-size:18px;">➕</span>
+ <span id="sc-name" style="font-size:9px;color:#f5d18a;margin-top:2px;">ว่าง</span>
+</div>
+
+<div id="digbtn" title="คลิกเพื่อขุดดิน">
+ <span style="font-size:18px;">⛏️</span>
+ <span style="font-size:9px;color:#ffedd6;margin-top:2px;">ขุดดิน</span>
+</div>
+
+<div id="fishbtn" title="คลิกเพื่อตกปลา">
+ <span style="font-size:18px;">🎣</span>
+ <span style="font-size:9px;color:#d6edff;margin-top:2px;">ตกปลา</span>
+</div>
+
+<div id="quest" class="ui">📜 <b id="questtitle">เควส: ปูนาเต็มข้อง</b><br><span id="questtext">คุยกับลุงชาวนาที่หมู่บ้าน</span></div>
+<div id="topright"><button id="mapbtn">🗺️ แผนที่</button><button id="invbtn">🎒 กระเป๋า</button></div>
+<div id="toast" class="ui"></div>
+
+<div id="bottom">
+ <div style="width:126px;height:126px;pointer-events:none;"></div>
+ <div id="actions">
+  <button class="action" id="talk">💬</button>
+  <button class="action" id="bagbtn">🎒</button>
+  <button class="action" id="map2" style="grid-column: span 2; width: 100%;">🗺</button>
+ </div>
+</div>
+
+<div id="stick"><div id="nub"></div></div>
+
+<div id="dialog">
+ <b id="dialogtitle">ลุงชาวนา</b>
+ <p id="dialogtext">ช่วยจับปูนา 10 ตัวให้ลุงหน่อยได้ไหม?</p>
+ <div>
+  <button id="accept">รับเควส</button>
+  <button id="shopbtn-dialog" style="display:none;background:#7c522b;">เปิดร้านค้า</button>
+  <button id="close">ปิด</button>
+ </div>
+</div>
+
+<div id="levelupmenu">
+ <h3>⭐ เลเวลอัป! ระบบอัพค่าพลัง</h3>
+ <p id="uptext" style="color:#f5d18a;margin:6px 0 12px 0;font-size:13px;">เลือกอัปเกรดค่าพลัง (เหลือ 3 แต้ม)</p>
+ <button class="up-btn" id="uphpbtn">❤️ เพิ่ม HP สูงสุด (+2)</button>
+ <button class="up-btn" id="upfoodbtn">🍗 เพิ่มหลอดอาหารสูงสุด (+2)</button>
+ <button class="up-btn" id="updmgbtn">⚔️ เพิ่มพลังโจมตี (+2 ดาเมจ)</button>
+</div>
+
+<div id="mapmenu">
+ <h3>🗺️ เลือกแผนที่นำทาง</h3>
+ <div id="maplistcontainer"></div>
+ <button id="mapclose" style="width:100%;margin-top:6px;background:#793833;">ปิด</button>
+</div>
+
+<div id="inventory">
+ <h3>🎒 กระเป๋าสัมภาระของผู้เล่น</h3>
+ <button id="invclose" style="position:absolute;top:10px;right:10px;background:#793833;padding:4px 8px;">X</button>
+ <div class="items" id="itemlist"></div>
+</div>
+
+<div id="shopmenu">
+ <h3 id="shoptitle">💰 ร้านค้า</h3>
+ <button id="shopclose" style="position:absolute;top:10px;right:10px;background:#793833;padding:4px 8px;">X</button>
+ <div id="shopitemlist" style="margin-top:10px;"></div>
+</div>
+
+<script>
+// --- ระบบเสียง (Audio System ด้วย Web Audio API) ---
+let audioCtx = null;
+let bgmInterval = null;
+
+function initAudio(){
+ if(!audioCtx){
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+ }
+ if(audioCtx.state === 'suspended'){
+  audioCtx.resume();
+ }
+}
+
+// เสียงกดปุ่ม / คลิกทั่วไป
+function playSoundClick(){
+ try{
+  initAudio();
+  let osc = audioCtx.createOscillator();
+  let gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+  gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.08);
+ }catch(e){}
+}
+
+// เสียงฟันดาบ / โจมตีมอนสเตอร์
+function playSoundAttack(){
+ try{
+  initAudio();
+  let osc = audioCtx.createOscillator();
+  let gain = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+  osc.frequency.linearRampToValueAtTime(60, audioCtx.currentTime + 0.12);
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.12);
+ }catch(e){}
+}
+
+// เสียงเพลงบรรยากาศบ้านทุ่งชิวๆ (วนลูปโน้ตเพลงไทยแนวผ่อนคลาย)
+function startBGM(){
+ if(bgmInterval) return;
+ let notes = [261.63, 293.66, 329.63, 392.00, 440.00, 392.00, 329.63, 293.66]; // โน้ตเพลงชิวๆ
+ let index = 0;
+ 
+ bgmInterval = setInterval(() => {
+  if(!audioCtx || audioCtx.state !== 'running') return;
+  try{
+   let osc = audioCtx.createOscillator();
+   let gain = audioCtx.createGain();
+   osc.type = 'sine';
+   osc.frequency.setValueAtTime(notes[index], audioCtx.currentTime);
+   
+   gain.gain.setValueAtTime(0.03, audioCtx.currentTime); // เสียงเบาฟังสบายไม่หนวกหู
+   gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+   
+   osc.connect(gain);
+   gain.connect(audioCtx.destination);
+   osc.start();
+   osc.stop(audioCtx.currentTime + 0.6);
+   
+   index = (index + 1) % notes.length;
+  }catch(e){}
+ }, 700);
+}
+
+// ผูกเสียงคลิกกับปุ่มทั่วยอดฮิตอัตโนมัติ
+document.addEventListener('click', (e) => {
+ if(e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.id === 'shortcutslot'){
+  playSoundClick();
+ }
+});
+
+// ประกาศตัวแปร Global ด้านนอกสุดเพื่อให้ HTML เรียกใช้ฟังก์ชันโหลดไฟล์ได้
+let gameStartCallback = null;
+
+function loadGameFromFile(event){
+ playSoundClick();
+ let file = event.target.files[0];
+ if(!file) return;
+
+ let reader = new FileReader();
+ reader.onload = function(e){
+  try{
+   let data = JSON.parse(e.target.result);
+   if(data && data.player && data.items){
+    if(gameStartCallback) {
+     gameStartCallback(data);
+    }
+   } else {
+    alert('❌ รูปแบบไฟล์ JSON ไม่ถูกต้อง');
+   }
+  }catch(err){
+   alert('❌ ไฟล์เสียหายหรืออ่านข้อมูลไม่ได้');
+  }
+  event.target.value = '';
+ };
+ reader.readAsText(file);
+}
+
+(()=>{
+const rand=(a,b)=>a+Math.random()*(b-a), pick=a=>a[Math.floor(Math.random()*a.length)], dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+let W=0,H=0,dpr=1;
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=false}
+addEventListener('resize',resize);resize();
+
+const TILE=32, maps={
+'หมู่บ้าน':{w:52,h:42,base:'#82b957',path:'#c9b99a'},
+'ทุ่งนา':{w:52,h:42,base:'#91bd5b',path:'#b7a078'},
+'ป่าร้าง':{w:52,h:42,base:'#1b1a1c',path:'#2e2925'},
+'ไร่ซาก':{w:52,h:42,base:'#9caa61',path:'#a89a79'},
+'วัดเก่า':{w:52,h:42,base:'#76985a',path:'#bdb091'},
+'ป่าท้ายหมู่บ้าน':{w:52,h:42,base:'#47734b',path:'#917858'},
+'ดงพญาไฟ':{w:52,h:42,base:'#5c1d1d',path:'#7a3328'}};
+
+let mapName='หมู่บ้าน',map=maps[mapName],player={name:'ผู้กล้าบ้านทุ่ง',x:map.w*TILE/2 + 160,y:map.w*TILE/2 + 200,hp:100,maxhp:100,food:100,maxfood:100,lv:1,exp:0,coins:25,dir:0,radius:12,damage:50,equippedTako:false,equippedTusk:false,equippedRod:false,equippedHoe:false};
+let cam={x:0,y:0},keys={},mobs=[],decor=[],solids=[],floorItems=[],mangoTrees=[],ponds=[];
+let levelUpOpen=false, pendingPoints=0, gameStarted=false, activeShopType = 'hunter';
+let shortcutItem = null;
+let killCountForCrit = 0; 
+let requiredKillsForCrit = Math.floor(rand(7, 11));
+let isFishing = false;
+let isDigging = false;
+
+let items={
+ 'ยาเพิ่มเลือด':3,
+ 'มะม่วง':0,
+ 'ข้าวต้มมัด':0,
+ 'ขนมต้ม':0,
+ 'บัวลอย':0,
+ 'บัวลอยไข่หวาน':0,
+ 'ปูนา':0,
+ 'ก้ามปู':0,
+ 'ก้ามปูทองคำ':0,
+ 'ผ้าคลุมผี':0,
+ 'ผ้าคลุมผีสีทอง':0,
+ 'หนังหมูป่า':0,
+ 'เนื้อหมูป่า':0,
+ 'เขี้ยวตัน':0,
+ 'ใยแมงมุม':0,
+ 'เขี้ยวพิษ':0,
+ 'เขี้ยวพิษสีทอง':0,
+ 'เบ็ดตกปลา':0,
+ 'ปลาหมอ':0,
+ 'ปลาซิว':0,
+ 'จอบ':0,
+ 'ไส้เดือน':0,
+ 'ตะกรุดลงอาคม':0
+};
+
+const itemPrices={
+ 'มะม่วง': 1,
+ 'ข้าวต้มมัด': 10,
+ 'ขนมต้ม': 20,
+ 'บัวลอย': 25,
+ 'บัวลอยไข่หวาน': 50,
+ 'ปูนา': 1,
+ 'ก้ามปู': 5,
+ 'ก้ามปูทองคำ': 50,
+ 'หนังหมูป่า': 60,
+ 'เนื้อหมูป่า': 10,
+ 'เขี้ยวตัน': 500,
+ 'ผ้าคลุมผี': 15,
+ 'ผ้าคลุมผีสีทอง': 100,
+ 'ใยแมงมุม': 25,
+ 'เขี้ยวพิษ': 200,
+ 'เขี้ยวพิษสีทอง': 400,
+ 'ปลาหมอ': 15,
+ 'ปลาซิว': 5,
+ 'จอบ': 0,
+ 'ไส้เดือน': 0,
+ 'ตะกรุดลงอาคม': 500,
+ 'เบ็ดตกปลา': 0
+};
+
+// ตั้งค่าให้ NPC ทุกตัวในเกมมีสถานะเดินไปมาได้ทั้งหมด (isStatic = false) โดยให้อยู่บนพื้นหญ้าและไม่ทับตัวบ้าน
+let npcsData = {
+ 'หมู่บ้าน': [
+  {x: maps['หมู่บ้าน'].w*TILE/2-95, y: maps['หมู่บ้าน'].h*TILE/2+65, origX: maps['หมู่บ้าน'].w*TILE/2-95, origY: maps['หมู่บ้าน'].h*TILE/2+65, name:'ลุงชาวนา', kind:'farmer', vx:0, vy:0, timer:0, isStatic:false},
+  {x: maps['หมู่บ้าน'].w*TILE/2+150, y: maps['หมู่บ้าน'].h*TILE/2-65, origX: maps['หมู่บ้าน'].w*TILE/2+150, origY: maps['หมู่บ้าน'].h*TILE/2-65, name:'แม่ค้าสมใจ', kind:'merchant', vx:0, vy:0, timer:0, isStatic:false, patrolRadius:65},
+  {x: maps['หมู่บ้าน'].w*TILE/2-170, y: maps['หมู่บ้าน'].h*TILE/2-35, origX: maps['หมู่บ้าน'].w*TILE/2-170, origY: maps['หมู่บ้าน'].h*TILE/2-35, name:'ผู้ใหญ่บ้าน', kind:'elder', vx:0, vy:0, timer:0, isStatic:false, patrolRadius:65},
+  {x: maps['หมู่บ้าน'].w*TILE/2+25, y: maps['หมู่บ้าน'].h*TILE/2-15, origX: maps['หมู่บ้าน'].w*TILE/2+25, origY: maps['หมู่บ้าน'].h*TILE/2-15, name:'บุญรอด', kind:'boonnark', vx:0, vy:0, timer:0, isStatic:false, patrolRadius:65},
+  {x: maps['หมู่บ้าน'].w*TILE/2+190, y: maps['หมู่บ้าน'].h*TILE/2+35, origX: maps['หมู่บ้าน'].w*TILE/2+190, origY: maps['หมู่บ้าน'].h*TILE/2+35, name:'แม่ค้าขนมไทย', kind:'thaidessert', vx:0, vy:0, timer:0, isStatic:false, patrolRadius:55},
+  {x: maps['หมู่บ้าน'].w*TILE/2-120, y: maps['หมู่บ้าน'].h*TILE/2+140, origX: maps['หมู่บ้าน'].w*TILE/2-120, origY: maps['หมู่บ้าน'].h*TILE/2+140, name:'ลูกศิษย์หมอผี', kind:'shamanapprentice', vx:0, vy:0, timer:0, isStatic:false}
+ ],
+ 'ไร่ซาก': [
+  {x: maps['ไร่ซาก'].w*TILE/2 - 120, y: maps['ไร่ซาก'].h*TILE/2, origX: maps['ไร่ซาก'].w*TILE/2 - 120, origY: maps['ไร่ซาก'].h*TILE/2, name:'พรานโชค', kind:'hunter', vx:0, vy:0, timer:0, isStatic:false}
+ ],
+ 'วัดเก่า': [
+  {x: maps['วัดเก่า'].w*TILE/2 - 150, y: maps['วัดเก่า'].h*TILE/2 - 50, origX: maps['วัดเก่า'].w*TILE/2 - 150, origY: maps['วัดเก่า'].h*TILE/2 - 50, name:'หมอผี', kind:'shaman', vx:0, vy:0, timer:0, isStatic:false}
+ ],
+ 'ป่าท้ายหมู่บ้าน': [
+  {x: maps['ป่าท้ายหมู่บ้าน'].w*TILE/2, y: maps['ป่าท้ายหมู่บ้าน'].h*TILE/2, origX: maps['ป่าท้ายหมู่บ้าน'].w*TILE/2, origY: maps['ป่าท้ายหมู่บ้าน'].h*TILE/2, name:'ตาสม', kind:'fisherman', vx:0, vy:0, timer:0, isStatic:false}
+ ]
+};
+
+let quest={accepted:false,crabs:0,readyToComplete:false,done:false};
+let boonnarkQuest={accepted:false,ghosts:0,readyToComplete:false,done:false};
+let shamanQuest={accepted:false,metShaman:false,readyToComplete:false,done:false};
+
+let lastAttack=0,lastMob=0,toastTimer=0,dialogOpen=false,shopOpen=false,autoAttack=true;
+let playerMoving=false, walkPhase=0;
+let navigatingTarget = null;
+let gameTimeSeconds = 0;
+let currentTimeState = 'ช่วงเช้า';
+let touchJoy = { active: false, pid: null, startX: 0, startY: 0, x: 0, y: 0 };
+
+function notify(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';toastTimer=3.0}
+
+function saveGameData(){
+ let saveData = {
+  player: player,
+  items: items,
+  mapName: mapName,
+  quest: quest,
+  boonnarkQuest: boonnarkQuest,
+  shamanQuest: shamanQuest,
+  gameTimeSeconds: gameTimeSeconds,
+  shortcutItem: shortcutItem,
+  killCountForCrit: killCountForCrit,
+  requiredKillsForCrit: requiredKillsForCrit
+ };
+ 
+ let dataStr = JSON.stringify(saveData, null, 2);
+ let blob = new Blob([dataStr], { type: 'application/json' });
+ let url = URL.createObjectURL(blob);
+ 
+ let downloadAnchor = document.createElement('a');
+ downloadAnchor.href = url;
+ downloadAnchor.download = `tarnarn_bantung_save_${player.name}_${Date.now()}.json`;
+ document.body.appendChild(downloadAnchor);
+ downloadAnchor.click();
+ downloadAnchor.remove();
+ URL.revokeObjectURL(url);
+ 
+ notify('💾 ดาวน์โหลดไฟล์เซฟ .json สำเร็จ!');
+}
+
+document.getElementById('savebtn').onclick = () => {
+ saveGameData();
+};
+
+gameStartCallback = function(data){
+ player = data.player;
+ items = data.items;
+ mapName = data.mapName || 'หมู่บ้าน';
+ quest = data.quest || quest;
+ boonnarkQuest = data.boonnarkQuest || boonnarkQuest;
+ shamanQuest = data.shamanQuest || shamanQuest;
+ gameTimeSeconds = data.gameTimeSeconds || 0;
+ shortcutItem = data.shortcutItem || null;
+ killCountForCrit = data.killCountForCrit || 0;
+ requiredKillsForCrit = data.requiredKillsForCrit || Math.floor(rand(7, 11));
+ 
+ document.getElementById('namelabel').textContent = player.name;
+ if(player.damage === undefined) player.damage = 50;
+ if(player.equippedTako === undefined) player.equippedTako = false;
+ if(player.equippedTusk === undefined) player.equippedTusk = false;
+ if(player.equippedRod === undefined) player.equippedRod = false;
+ if(player.equippedHoe === undefined) player.equippedHoe = false;
+ 
+ document.getElementById('loginoverlay').style.display = 'none';
+ gameStarted = true;
+ startBGM();
+ makeWorld();
+ updateHUD();
+ updateQuestUI();
+ updateShortcutUI();
+ notify('📂 โหลดไฟล์เซฟ .json สำเร็จ!');
+};
+
+document.getElementById('loginbtn').onclick = () => {
+ let nameVal = document.getElementById('usernameinput').value.trim();
+ if(nameVal.length < 4){
+  alert('กรุณากรอกชื่อผู้เล่นอย่างน้อย 4 ตัวอักษรขึ้นไป');
+  return;
+ }
+
+ player.name = nameVal;
+ document.getElementById('namelabel').textContent = player.name;
+
+ document.getElementById('loginoverlay').style.display = 'none';
+ gameStarted = true;
+ startBGM();
+ makeWorld();
+ updateHUD();
+ updateQuestUI();
+ updateShortcutUI();
+ notify('✨ เริ่มเกมใหม่สำเร็จ!');
+};
+
+function updateShortcutUI(){
+ const iconEl = document.getElementById('sc-icon');
+ const nameEl = document.getElementById('sc-name');
+ 
+ if(shortcutItem && (!items[shortcutItem] || items[shortcutItem] <= 0)){
+  shortcutItem = null;
+  notify('⚠️ ไอเทมในช่องลัดหมดแล้ว ถูกรีเซ็ตเป็นช่องว่าง');
+ }
+
+ if(shortcutItem){
+  iconEl.textContent = shortcutItem === 'ยาเพิ่มเลือด' ? '💊' : (shortcutItem === 'มะม่วง' ? '🥭' : (shortcutItem.includes('บัวลอย') || shortcutItem.includes('ข้าวต้ม') || shortcutItem.includes('ขนม') ? '🍡' : '📦'));
+  nameEl.textContent = `${shortcutItem} (${items[shortcutItem]})`;
+ } else {
+  iconEl.textContent = '➕';
+  nameEl.textContent = 'ว่าง';
+ }
+}
+
+document.getElementById('shortcutslot').onclick = () => {
+ if(!shortcutItem){
+  notify('เปิดกระเป๋าเพื่อเลือกไอเทมมาใส่ช่องลัด');
+  toggleInventory(true);
+ } else {
+  useShortcutItem();
+ }
+};
+
+function useShortcutItem(){
+ if(!shortcutItem) return;
+ if(shortcutItem === 'ยาเพิ่มเลือด'){
+  window.usePotion();
+ } else if(shortcutItem === 'มะม่วง'){
+  window.eatMango();
+ } else if(shortcutItem === 'ข้าวต้มมัด'){
+  window.eatThaiDessert('ข้าวต้มมัด', 10);
+ } else if(shortcutItem === 'ขนมต้ม'){
+  window.eatThaiDessert('ขนมต้ม', 20);
+ } else if(shortcutItem === 'บัวลอย'){
+  window.eatThaiDessert('บัวลอย', 25);
+ } else if(shortcutItem === 'บัวลอยไข่หวาน'){
+  window.eatThaiDessert('บัวลอยไข่หวาน', 50);
+ }
+ updateShortcutUI();
+}
+
+function makeWorld(){
+ map=maps[mapName];mobs=[];decor=[];solids=[];floorItems=[];mangoTrees=[];ponds=[];
+ 
+ const village = mapName==='หมู่บ้าน';
+ const oldTemple = mapName==='วัดเก่า';
+ const forestEnd = mapName==='ป่าท้ายหมู่บ้าน';
+ let restrictedZones = [];
+
+ if(village){
+  let mainHouses = [
+   {x: map.w*TILE/2 - 270, y: map.h*TILE/2 - 180, w: 170, h: 85},
+   {x: map.w*TILE/2 + 80, y: map.h*TILE/2 - 180, w: 170, h: 90},
+   {x: map.w*TILE/2 - 270, y: map.h*TILE/2 + 30, w: 150, h: 80},
+   {x: map.w*TILE/2 + 80, y: map.h*TILE/2 + 10, w: 140, h: 75},
+   {x: map.w*TILE/2 - 270, y: map.h*TILE/2 + 200, w: 150, h: 80},
+   {x: map.w*TILE/2 + 80, y: map.h*TILE/2 + 170, w: 160, h: 85}
+  ];
+
+  for(let mh of mainHouses){
+   solids.push({x: mh.x + mh.w/2, y: mh.y + mh.h/2, r: mh.w/2 - 5});
+   restrictedZones.push({x: mh.x + mh.w/2, y: mh.y + mh.h/2, r: mh.w/2 + 10});
+  }
+
+  let dessertShopX = map.w*TILE/2 + 150, dessertShopY = map.h*TILE/2 + 105;
+  solids.push({x: dessertShopX, y: dessertShopY, r: 35});
+  restrictedZones.push({x: dessertShopX, y: dessertShopY, r: 50});
+
+  let mangoPositions = [
+   {x: map.w*TILE/2 - 260, y: map.h*TILE/2 - 70},
+   {x: map.w*TILE/2 - 260, y: map.h*TILE/2 + 140},
+   {x: map.w*TILE/2 + 250, y: map.h*TILE/2 - 70},
+   {x: map.w*TILE/2 + 250, y: map.h*TILE/2 + 100},
+   {x: map.w*TILE/2 - 180, y: map.h*TILE/2 + 240},
+   {x: map.w*TILE/2 + 180, y: map.h*TILE/2 + 240}
+  ];
+  for(const pos of mangoPositions){
+   let mangoCount = Math.floor(Math.random() * 5);
+   mangoTrees.push({x: pos.x, y: pos.y, mangos: mangoCount});
+   solids.push({x: pos.x, y: pos.y, r: 18});
+  }
+ } else if(oldTemple){
+  let tX = map.w*TILE/2 - 220, tY = map.h*TILE/2-150;
+  solids.push({x: tX + 80, y: tY + 55, r: 80});
+  restrictedZones.push({x: tX + 80, y: tY + 55, r: 110});
+ } else if(forestEnd){
+  let pondPositions = [
+   {x: map.w*TILE/4 - 40, y: map.h*TILE/4, r: 40},
+   {x: map.w*TILE*3/4 + 40, y: map.h*TILE/3, r: 45},
+   {x: map.w*TILE/4 - 50, y: map.h*TILE*3/4, r: 50},
+   {x: map.w*TILE*3/4 + 60, y: map.h*TILE*3/5, r: 35}
+  ];
+  for(const p of pondPositions){
+   ponds.push(p);
+   solids.push({x: p.x, y: p.y, r: p.r});
+   restrictedZones.push({x: p.x, y: p.y, r: p.r + 15});
+  }
+ }
+
+ let attempts = 0;
+ while(decor.length < 65 && attempts < 500){
+  attempts++;
+  let x=rand(40,map.w*TILE-40),y=rand(40,map.h*TILE-40);
+  if(Math.abs(x-player.x)<150&&Math.abs(y-player.y)<120)continue;
+  
+  let tooCloseToRestricted = false;
+  for(const rz of restrictedZones){
+   if(Math.hypot(x - rz.x, y - rz.y) < rz.r){ tooCloseToRestricted = true; break; }
+  }
+  if(tooCloseToRestricted) continue;
+
+  let overlap = false;
+  for(const d of decor){
+   if(Math.hypot(x - d.x, y - d.y) < 35){ overlap = true; break; }
+  }
+  if(overlap) continue;
+
+  let type=pick(['tree','tree','rock']);
+  let rSize = type==='tree'? 16 : 12;
+  decor.push({x,y,type,s:rand(.7,1.3)});
+  solids.push({x:x, y:y, r: rSize});
+ }
+
+ if(mapName === 'ทุ่งนา'){
+  for(let i=0; i<20; i++){
+   let mhp = 100;
+   mobs.push({x:rand(50,map.w*TILE-50),y:rand(50,map.h*TILE-50),type:'crab',hp:mhp,maxhp:mhp,alive:true,hit:0,aggro:false,respawn:0});
+  }
+ } else if(mapName === 'ป่าร้าง'){
+  for(let i=0; i<15; i++){
+   let mhp = 180;
+   mobs.push({x:rand(50,map.w*TILE-50),y:rand(50,map.h*TILE-50),type:'spider',hp:mhp,maxhp:mhp,alive:true,hit:0,aggro:false,respawn:0});
+  }
+  for(let i=0; i<5; i++){
+   let mhp = 250;
+   mobs.push({x:rand(50,map.w*TILE-50),y:rand(50,map.h*TILE-50),type:'bigspider',hp:mhp,maxhp:mhp,alive:true,hit:0,aggro:false,respawn:0});
+  }
+ } else if(mapName === 'ไร่ซาก'){
+  for(let i=0; i<20; i++){
+   let mhp = 150;
+   mobs.push({x:rand(50,map.w*TILE-50),y:rand(50,map.h*TILE-50),type:'boar',hp:mhp,maxhp:mhp,alive:true,hit:0,aggro:false,respawn:0});
+  }
+ } else if(mapName === 'วัดเก่า'){
+  for(let i=0; i<20; i++){
+   let mhp = 170;
+   mobs.push({x:rand(50,map.w*TILE-50),y:rand(50,map.h*TILE-50),type:'ghost',hp:mhp,maxhp:mhp,alive:true,hit:0,aggro:false,respawn:0});
+  }
+ } else if(mapName === 'ดงพญาไฟ'){
+  for(let i=0; i<10; i++){
+   let mhp = 400;
+   mobs.push({x:rand(50,map.w*TILE-50),y:rand(50,map.h*TILE-50),type:'ghostboar',hp:mhp,maxhp:mhp,alive:true,hit:0,aggro:false,respawn:0});
+  }
+ }
+}
+
+function getNPCs(){
+ let list = npcsData[mapName] || [];
+ if(mapName === 'หมู่บ้าน' && currentTimeState === 'กลางคืน'){
+  return list.filter(n => {
+   if(n.kind === 'boonnark') return true;
+   if(n.kind === 'shamanapprentice') return true;
+   if(n.kind === 'farmer' && quest.readyToComplete && !quest.done) return true;
+   if(n.kind === 'boonnark' && boonnarkQuest.readyToComplete && !boonnarkQuest.done) return true;
+   return false;
+  });
+ }
+ if(mapName === 'หมู่บ้าน'){
+  return list.filter(n => {
+   if(n.kind === 'thaidessert'){
+    return currentTimeState === 'ช่วงเช้า' || currentTimeState === 'ช่วงเย็น';
+   }
+   return true;
+  });
+ }
+ if(mapName === 'วัดเก่า'){
+  return list.filter(n => {
+   if(n.kind === 'shaman'){
+    return currentTimeState === 'ช่วงเช้า' || currentTimeState === 'ช่วงเย็น';
+   }
+   return true;
+  });
+ }
+ if(mapName === 'ป่าท้ายหมู่บ้าน'){
+  return list.filter(n => {
+   if(n.kind === 'fisherman'){
+    return currentTimeState === 'ช่วงเย็น';
+   }
+   return true;
+  });
+ }
+ return list;
+}
+
+function updateNPCsMovement(dt){
+  // เขตห้ามเดินทับบ้าน/ร้านค้า ใช้พิกัดเดียวกับตำแหน่งวัตถุในหมู่บ้าน
+  const villageCenterX = maps['หมู่บ้าน'].w * TILE / 2;
+  const villageCenterY = maps['หมู่บ้าน'].h * TILE / 2;
+  const villageHouseZones = [
+    {x:villageCenterX-185,y:villageCenterY-137,rx:100,ry:57},
+    {x:villageCenterX+165,y:villageCenterY-135,rx:100,ry:62},
+    {x:villageCenterX-195,y:villageCenterY+70,rx:90,ry:50},
+    {x:villageCenterX+150,y:villageCenterY+47,rx:85,ry:47},
+    {x:villageCenterX-195,y:villageCenterY+240,rx:90,ry:50},
+    {x:villageCenterX+160,y:villageCenterY+212,rx:95,ry:53},
+    {x:villageCenterX+150,y:villageCenterY+105,rx:56,ry:40}
+  ];
+
+  function canNPCWalk(n, x, y, key){
+    const margin = 22;
+    const worldW = maps[key].w * TILE, worldH = maps[key].h * TILE;
+    if(x < margin || y < margin || x > worldW-margin || y > worldH-margin) return false;
+
+    if(key === 'หมู่บ้าน'){
+      // จำกัด NPC ให้อยู่ใกล้จุดประจำตัวและเดินบนพื้นที่หญ้าที่ปลอดจากบ้าน
+      const patrol = n.patrolRadius || 75;
+      if(Math.hypot(x-n.origX, y-n.origY) > patrol) return false;
+      for(const hz of villageHouseZones){
+        const nx=(x-hz.x)/hz.rx, ny=(y-hz.y)/hz.ry;
+        if(nx*nx + ny*ny < 1.08) return false;
+      }
+      // กันต้นไม้/หินและสิ่งกีดขวางอื่น ๆ
+      for(const tree of mangoTrees){
+        if(Math.hypot(x-tree.x,y-tree.y) < 31) return false;
+      }
+      for(const obj of decor){
+        if(Math.hypot(x-obj.x,y-obj.y) < (obj.type === 'tree' ? 31 : 25)) return false;
+      }
+    }
+    return true;
+  }
+
+  for(const mKey in npcsData){
+    for(const n of npcsData[mKey]){
+      if(n.isStatic) continue;
+      if(mKey === 'วัดเก่า' && n.kind === 'shaman' && currentTimeState === 'กลางคืน') continue;
+      if(mKey === 'ป่าท้ายหมู่บ้าน' && n.kind === 'fisherman' && currentTimeState !== 'ช่วงเย็น') continue;
+
+      // NPC หยุดชั่วคราวเมื่อผู้เล่นเข้าใกล้ เพื่อคุยได้ง่าย
+      if(dist(player,n) < 58){
+        n.vx=0; n.vy=0; n.moving=false;
+        continue;
+      }
+
+      n.timer -= dt;
+      if(n.timer <= 0){
+        n.timer = rand(1.8,4.2);
+        if(Math.random() < 0.78){
+          const angle=Math.random()*Math.PI*2;
+          const speed=rand(13,22);
+          n.vx=Math.cos(angle)*speed;
+          n.vy=Math.sin(angle)*speed;
+          n.moving=true;
+        }else{
+          n.vx=0; n.vy=0; n.moving=false;
+        }
+      }
+
+      const nextX=n.x+n.vx*dt, nextY=n.y+n.vy*dt;
+      if(canNPCWalk(n,nextX,nextY,mKey)){
+        n.x=nextX; n.y=nextY;
+      }else{
+        // เปลี่ยนทิศเมื่อเจอสิ่งกีดขวาง แทนการเดินทะลุบ้าน
+        const tryX=n.x+n.vx*dt, tryY=n.y;
+        const tryXOnly=canNPCWalk(n,tryX,n.y,mKey);
+        const tryYOnly=canNPCWalk(n,n.x,n.y+n.vy*dt,mKey);
+        if(tryXOnly){ n.x=tryX; n.vy=0; n.vx=-n.vx; }
+        else if(tryYOnly){ n.y=tryY; n.vx=0; n.vy=-n.vy; }
+        else { n.vx=-n.vx; n.vy=-n.vy; }
+        n.timer=0.3;
+      }
+
+      if(Math.hypot(n.x-n.origX,n.y-n.origY) > (n.patrolRadius || 80)){
+        n.vx=n.origX-n.x; n.vy=n.origY-n.y;
+        const mag=Math.hypot(n.vx,n.vy)||1;
+        n.vx=n.vx/mag*18; n.vy=n.vy/mag*18;
+      }
+    }
+  }
+}
+function setMap(name,x,y){
+ mapName=name;map=maps[name];player.x=x??map.w*TILE/2;player.y=y??map.h*TILE/2;
+ makeWorld();
+ notify('เข้าสู่ '+name);
+ updateQuestUI();
+ if(navigatingTarget === mapName){
+  navigatingTarget = null;
+  notify('ถึงจุดหมายปลายทางแล้ว!');
+ }
+}
+
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)}
+function text(t,x,y,size=10,color='#fff',align='center'){ctx.font=`bold ${size}px Tahoma`;ctx.textAlign=align;ctx.lineWidth=2.5;ctx.strokeStyle='#33291f';ctx.strokeText(t,x,y);ctx.fillStyle=color;ctx.fillText(t,x,y)}
+function pathLine(x1,y1,x2,y2,width,c){ctx.strokeStyle=c;ctx.lineWidth=width;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function drawTree(x,y,s=1,purple=false){
+ ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(s,s);
+ rect(-12,13,25,4,'rgba(28,36,20,.22)');rect(-4,-1,9,17,'#694326');rect(-3,0,3,14,'#98613a');rect(3,3,2,11,'#4a321f');
+ rect(-8,9,5,3,'#694326');rect(3,10,6,3,'#694326');
+ const leaf=purple?['#493d5d','#685078','#85629a','#a181b5']:['#235c37','#2f773d','#439447','#5caf4d','#78c45a'];
+ const blocks=[
+ [-17,-23,12,8,1],[-9,-31,12,8,2],[1,-34,12,8,3],[10,-27,10,8,2],
+ [-23,-15,12,8,1],[-12,-18,12,8,3],[0,-20,12,8,4],[11,-16,12,8,3],[20,-12,7,8,2],
+ [-21,-6,12,8,2],[-9,-8,12,8,4],[3,-8,12,8,3],[14,-4,10,8,1],
+ [-15,1,12,7,1],[-3,0,12,7,2],[9,2,10,6,2]
+ ];
+ for(const [bx,by,bw,bh,ci] of blocks)rect(bx,by,bw,bh,leaf[ci%leaf.length]);
+ rect(-9,-27,4,4,purple?'#b89ac8':'#a4dc70');rect(5,-14,4,4,purple?'#9a7eb0':'#8cce65');rect(-17,-5,4,3,purple?'#9a7eb0':'#8cce65');
+ ctx.restore();
+}
+
+function drawMangoTree(mt){
+  let x=mt.x-cam.x, y=mt.y-cam.y;
+  if(x<-65||y<-75||x>W+65||y>H+65) return;
+  ctx.save(); ctx.translate(Math.round(x),Math.round(y));
+  ctx.fillStyle='rgba(25,35,18,.25)'; ctx.beginPath(); ctx.ellipse(0,15,23,7,0,0,Math.PI*2); ctx.fill();
+  rect(-5,-5,10,23,'#704526'); rect(-3,-3,3,18,'#a16a3d');
+  pathLine(0,2,-13,-17,4,'#704526'); pathLine(1,-1,13,-18,4,'#704526');
+  const leaves=[[-20,-24,24,18,'#286b35'],[-8,-34,25,20,'#347e3c'],[8,-29,25,21,'#246331'],[-25,-12,23,17,'#347b39'],[-7,-16,26,20,'#439447'],[12,-13,22,18,'#2d7135'],[0,-25,20,17,'#58a94a'],[-14,-5,20,12,'#3c853b']];
+  for(const [lx,ly,lw,lh,c] of leaves){ctx.fillStyle=c;ctx.fillRect(lx,ly,lw,lh);}
+  rect(-10,-30,7,4,'#70bd55'); rect(9,-25,6,4,'#65b64e'); rect(-20,-14,5,3,'#6fbd54'); rect(1,-10,7,3,'#5aa84a');
+  if(mt.mangos>0){
+    const fruit=[[-13,-19],[-2,-29],[12,-18],[4,-8],[-19,-7]];
+    for(let i=0;i<Math.min(mt.mangos,fruit.length);i++){
+      const [mx,my]=fruit[i];
+      ctx.fillStyle='#e9a928'; ctx.beginPath(); ctx.ellipse(mx,my,3.3,4.8,-.35,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ffdc58'; ctx.fillRect(mx-1,my-3,2,3);
+      ctx.fillStyle='#356c32'; ctx.fillRect(mx+1,my-6,3,2);
+    }
+  }
+  ctx.restore();
+}
+
+function drawDecor(d){let x=d.x-cam.x,y=d.y-cam.y;if(x<-50||y<-50||x>W+50||y>H+50)return;
+ if(d.type==='tree')drawTree(x,y,d.s,mapName==='ป่าร้าง'||mapName==='ป่าท้ายหมู่บ้าน'||mapName==='ดงพญาไฟ');
+ else if(d.type==='rock'){ctx.fillStyle='#8e9187';ctx.strokeStyle='#62665d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-8,y+4);ctx.lineTo(x-5,y-5);ctx.lineTo(x+2,y-8);ctx.lineTo(x+9,y-1);ctx.lineTo(x+7,y+5);ctx.closePath();ctx.fill();ctx.stroke()}
+}
+function drawHouse(x,y,w=150,h=90){
+ rect(x+8,y+h+10,w-2,7,'rgba(35,27,18,.24)');
+ rect(x+9,y+25,w-18,h-8,'#5a3824');rect(x+13,y+29,w-26,h-14,'#9a6339');
+ for(let i=17;i<w-16;i+=13){rect(x+i,y+30,3,h-17,'#704528');rect(x+i+3,y+35,2,h-23,'#b17b48')}
+ rect(x+18,y+40,25,20,'#3b2b20');rect(x+20,y+42,21,16,'#f1c66d');rect(x+22,y+44,17,12,'#ffe8a0');
+ rect(x+w-43,y+40,25,20,'#3b2b20');rect(x+w-41,y+42,21,16,'#f1c66d');rect(x+w-39,y+44,17,12,'#ffe8a0');
+ for(let px of [x+15,x+Math.round(w*.34),x+Math.round(w*.67),x+w-20]){rect(px,y+h-5,7,29,'#593923');rect(px+2,y+h-4,2,25,'#ad7947');rect(px-3,y+h+22,13,4,'#4a301e')}
+ rect(x-9,y+17,w+18,14,'#4b2c1d');rect(x-5,y+13,w+10,7,'#74432a');
+ const roof='#5b3020', roofLight='#9b5933';
+ for(let row=0;row<5;row++){let inset=row*11;rect(x-14+inset,y+13+row*4,w+28-inset*2,5,roof);rect(x-11+inset,y+14+row*4,w+22-inset*2,2,roofLight)}
+ rect(x+w/2-5,y-8,10,22,'#5b3020');rect(x+w/2-2,y-7,3,18,'#a66a3d');
+ rect(x-13,y+29,w+26,5,'#3d2519');rect(x-10,y+30,w+20,2,'#d1a15b');
+ rect(x+w/2-13,y+h-28,26,29,'#3d251b');rect(x+w/2-9,y+h-25,18,26,'#251d19');rect(x+w/2-2,y+h-23,3,22,'#98613b');
+ rect(x+4,y+31,4,h-7,'#c18a4e');rect(x+w-8,y+31,4,h-7,'#c18a4e');
+}
+
+function drawThaiDessertShop(x, y){
+ let rx=Math.round(x-cam.x), ry=Math.round(y-cam.y);
+ if(rx<-120||ry<-120||rx>W+120||ry>H+120)return;
+ rect(rx-50,ry+30,100,7,'rgba(30,20,12,.25)');
+ rect(rx-42,ry-17,84,54,'#5a3823');rect(rx-36,ry-12,72,44,'#9a6237');
+ for(let i=-30;i<=30;i+=12){rect(rx+i,ry-9,3,39,'#704528')}
+ rect(rx-52,ry-31,104,18,'#7c352b');rect(rx-52,ry-31,104,5,'#c35c42');
+ for(let i=-48;i<50;i+=16){rect(rx+i,ry-26,8,13,'#e5b46d')}
+ rect(rx-47,ry-12,94,5,'#4a2a1b');rect(rx-45,ry+5,90,12,'#d5b27a');rect(rx-45,ry+5,90,3,'#f2d69a');
+ rect(rx-32,ry-1,12,5,'#e8c58b');rect(rx-7,ry-2,13,6,'#f3d8a1');rect(rx+20,ry-1,12,5,'#e8c58b');
+ rect(rx-40,ry+37,5,15,'#51321f');rect(rx+35,ry+37,5,15,'#51321f');
+ text('ขนมไทย',rx,ry-36,9,'#ffe4a0');
+}
+
+function getTargetExitCoord(targetMap){
+ let w=map.w*TILE, h=map.h*TILE;
+ if(mapName==='หมู่บ้าน'){
+  if(targetMap==='ทุ่งนา') return {x: w/2, y: 18};
+  if(targetMap==='ป่าร้าง') return {x: w-18, y: h/2};
+  if(targetMap==='ไร่ซาก') return {x: 18, y: h/2};
+  if(targetMap==='วัดเก่า') return {x: w/2, y: h-18};
+ }else if(mapName==='ทุ่งนา'){
+  if(targetMap==='หมู่บ้าน') return {x: w/2, y: h-18};
+  if(targetMap==='ป่าท้ายหมู่บ้าน') return {x: w-18, y: h/2};
+  if(targetMap==='ป่าร้าง') return {x: w-18, y: h/2};
+  if(targetMap==='ไร่ซาก' || targetMap==='วัดเก่า') return {x: w/2, y: h-18};
+ }else if(mapName==='ป่าร้าง'){
+  if(targetMap==='หมู่บ้าน') return {x: 18, y: h/2};
+  if(targetMap==='ป่าท้ายหมู่บ้าน') return {x: w/2, y: h-18};
+  if(targetMap==='ดงพญาไฟ') return {x: w/2, y: 18};
+  if(targetMap==='ทุ่งนา' || targetMap==='ไร่ซาก' || targetMap==='วัดเก่า') return {x: 18, y: h/2};
+ }else if(mapName==='ดงพญาไฟ'){
+  if(targetMap==='ป่าร้าง') return {x: w/2, y: h-18};
+ }else{
+  if(targetMap==='หมู่บ้าน') return {x: w/2, y: 18};
+  return {x: w/2, y: 18};
+ }
+ return {x: w/2, y: 18};
+}
+
+function drawNavigationPath(){
+ if(!navigatingTarget || navigatingTarget === mapName || navigatingTarget === 'ดงพญาไฟ') return;
+ let targetCoord = getTargetExitCoord(navigatingTarget);
+ let startX = player.x - cam.x;
+ let startY = player.y - cam.y;
+ let endX = targetCoord.x - cam.x;
+ let endY = targetCoord.y - cam.y;
+
+ ctx.save();
+ ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+ ctx.lineWidth = 4;
+ ctx.setLineDash([8, 8]);
+ ctx.beginPath();
+ ctx.moveTo(startX, startY);
+ ctx.lineTo(endX, endY);
+ ctx.stroke();
+ ctx.restore();
+}
+
+function drawFloorItems(){
+ for(const item of floorItems){
+  let x = item.x - cam.x;
+  let y = item.y - cam.y;
+  if(x < -30 || y < -30 || x > W + 30 || y > H + 30) continue;
+  
+  ctx.save();
+  ctx.translate(x, y);
+  let color = item.isGold ? '#ffd700' : (item.name === 'ไส้เดือน' ? '#c4724d' : '#cccccc');
+  let glowColor = item.isGold ? '#ffaa00' : (item.name === 'ไส้เดือน' ? '#8a4220' : '#888888');
+  
+  ctx.fillStyle = color;
+  ctx.strokeStyle = glowColor;
+  ctx.lineWidth = 2;
+  ctx.fillRect(-6, -6, 12, 12);
+  ctx.strokeRect(-6, -6, 12, 12);
+  
+  text(item.name, 0, -12, 9, item.isGold ? '#fff68f' : '#ffffff');
+  ctx.restore();
+ }
+}
+
+function drawWorld(){
+ rect(0,0,W,H,map.base);
+ const sx=Math.floor(cam.x/TILE),sy=Math.floor(cam.y/TILE),ex=sx+Math.ceil(W/TILE)+2,ey=sy+Math.ceil(H/TILE)+2;
+ for(let ty=sy;ty<ey;ty++)for(let tx=sx;tx<ex;tx++){let seed=Math.abs((tx*73856093^ty*19349663)>>>0);if(seed%9===0){rect(tx*TILE-cam.x+seed%23,ty*TILE-cam.y+seed%19,3,3,mapName==='ทุ่งนา'?'#d6ce5e':mapName==='ป่าร้าง'?'#111012':mapName==='ดงพญาไฟ'?'#8c2323':'#a1c968')}if(seed%29===0)rect(tx*TILE-cam.x+12,ty*TILE-cam.y+8,2,7,mapName==='ป่าร้าง'||mapName==='ดงพญาไฟ'?'#3d0f0f':'#648e43')}
+
+ for(let ty=sy;ty<ey;ty++)for(let tx=sx;tx<ex;tx++){
+  const seed=Math.abs((tx*83492791 ^ ty*297121507)>>>0), px=tx*TILE-cam.x, py=ty*TILE-cam.y;
+  if(seed%11===0 && mapName!=='ป่าร้าง' && mapName!=='ดงพญาไฟ'){
+   rect(px+5+(seed%13),py+7,2,5,'#719b48');rect(px+7+(seed%13),py+5,2,4,'#9bc968');
+  }
+  if(seed%17===0){rect(px+21,py+22,5,3,mapName==='ป่าร้าง'?'#292526':mapName==='ดงพญาไฟ'?'#79332b':'#b0a07b');rect(px+23,py+21,2,2,mapName==='ป่าร้าง'?'#393236':mapName==='ดงพญาไฟ'?'#9b4433':'#d0bd91');}
+ }
+ for(const p of ponds){
+  let px = p.x - cam.x, py = p.y - cam.y;
+  if(px>-100 && py>-100 && px<W+100 && py<H+100){
+   ctx.save();
+   ctx.fillStyle = '#266385';
+   ctx.strokeStyle = '#438dbd';
+   ctx.lineWidth = 4;
+   ctx.beginPath();
+   ctx.arc(px, py, p.r, 0, Math.PI * 2);
+   ctx.fill();
+   ctx.stroke();
+   ctx.restore();
+  }
+ }
+
+ if(mapName==='หมู่บ้าน'){
+ rect(map.w*TILE/2-42-cam.x,0-cam.y,84,map.h*TILE,'#b6a486');
+ for(let y=0;y<map.h*TILE;y+=22)for(let x=-35;x<35;x+=24)rect(map.w*TILE/2+x-cam.x,y-cam.y,17,13,'#cfc1a5');
+
+ drawHouse(map.w*TILE/2 - 270 - cam.x, map.h*TILE/2 - 180 - cam.y, 170, 85);
+ drawHouse(map.w*TILE/2 + 80 - cam.x, map.h*TILE/2 - 180 - cam.y, 170, 90);
+ drawHouse(map.w*TILE/2 - 270 - cam.x, map.h*TILE/2 + 30 - cam.y, 150, 80);
+ drawHouse(map.w*TILE/2 + 80 - cam.x, map.h*TILE/2 + 10 - cam.y, 140, 75);
+ drawHouse(map.w*TILE/2 - 270 - cam.x, map.h*TILE/2 + 200 - cam.y, 150, 80);
+ drawHouse(map.w*TILE/2 + 80 - cam.x, map.h*TILE/2 + 170 - cam.y, 160, 85);
+
+ drawThaiDessertShop(map.w*TILE/2 + 150, map.h*TILE/2 + 105);
+ }else if(mapName==='ทุ่งนา'){
+ for(let i=0;i<6;i++){let x=map.w*TILE/2-210+i*72-cam.x,y=map.h*TILE/2-110-cam.y;rect(x,y,60,235,'#8d9d45');for(let yy=0;yy<235;yy+=13){pathLine(x,y+yy,x+60,y+yy,2,'#b9ad57');for(let xx=8;xx<60;xx+=15)rect(x+xx,y+yy+2,3,7,'#598c3b')}}
+ pathLine(map.w*TILE/2-cam.x,0,map.w*TILE/2-cam.x,H,50,'#b9a27b');
+ }else{
+ pathLine(map.w*TILE/2-cam.x,0,map.w*TILE/2-cam.x,H,34,map.path);
+ if(mapName==='วัดเก่า'){
+  drawHouse(map.w*TILE/2-220-cam.x,map.h*TILE/2-150-cam.y,160,110);
+ }
+ }
+ if(player.x<22||player.x>map.w*TILE-22||player.y<22||player.y>map.h*TILE-22){rect(0,0,0,0,'#000')}
+ 
+ for(const mt of mangoTrees) drawMangoTree(mt);
+ for(const d of decor)drawDecor(d);
+ 
+ drawFloorItems();
+ drawNavigationPath();
+
+ const currentNPCs = getNPCs();
+ for(const n of currentNPCs){
+  let x=Math.round(n.x-cam.x), y=Math.round(n.y-cam.y);
+  let col = n.kind==='hunter' ? '#9c6b30' : (n.kind==='shaman' || n.kind==='shamanapprentice' ? '#5a3d7c' : (n.kind==='thaidessert' ? '#b84a39' : (n.kind==='fisherman' ? '#3d617c' : (n.kind==='farmer'||n.kind==='boonnark'?'#55834b':n.kind==='merchant'?'#6c86ac':'#b7a25d'))));
+  
+  let npcMoving = !!n.moving;
+  let npcWalkPhase = (n.x * 0.1 + n.y * 0.1);
+  let npcSwing = npcMoving ? Math.sin(npcWalkPhase)*2.5 : 0;
+  let npcBob = npcMoving ? Math.abs(Math.sin(npcWalkPhase))*1.2 : 0;
+
+  ctx.save();
+  ctx.translate(x, Math.round(y - npcBob));
+
+  rect(-9, 7+npcBob, 18, 4, 'rgba(24,20,14,.25)');
+  rect(-6, 1 + (npcMoving ? npcSwing : 0), 5, 7, '#4a3323');
+  rect(2, 1 - (npcMoving ? npcSwing : 0), 5, 7, '#4a3323');
+  rect(-8, -10, 16, 13, '#3e2b20');
+  rect(-7, -11, 14, 12, col);
+  rect(-9, -8, 3, 9, col);
+  rect(6, -8, 3, 9, col);
+  rect(-5, -21, 10, 10, '#e9b989');
+  rect(-6, -24, 12, 5, '#493021');
+  rect(-5, -26, 10, 3, '#6a4329');
+  rect(-3, -16, 2, 2, '#2c211b');
+  rect(2, -16, 2, 2, '#2c211b');
+  rect(-1, -12, 3, 1, '#9c6047');
+  
+  if(n.kind==='farmer'||n.kind==='boonnark'){rect(-8,-27,16,3,'#b58a48');rect(-5,-31,10,5,'#d5b36b');}
+  if(n.kind==='hunter'){rect(-7,-28,14,4,'#5a3b23');rect(-3,-31,6,4,'#8c5d32');}
+  if(n.kind==='shaman'||n.kind==='shamanapprentice'){rect(-8,-29,16,4,'#392b4d');rect(-3,-33,6,5,'#9a79ad');}
+  
+  ctx.restore();
+  text(n.name, x, y-35, 10, '#fff0b7');
+
+  if((n.kind === 'hunter' || n.kind === 'shaman' || n.kind === 'thaidessert' || n.kind === 'fisherman' || n.kind === 'elder') && dist(player, n) < 58){
+   ctx.save();
+   ctx.fillStyle = n.kind === 'shaman' ? '#4a2c5a' : (n.kind === 'thaidessert' ? '#8a3a2b' : (n.kind === 'fisherman' ? '#224961' : (n.kind === 'elder' ? '#614922' : '#79532c')));
+   ctx.strokeStyle = '#f5d18a';
+   ctx.lineWidth = 3;
+   ctx.beginPath();
+   ctx.arc(x, y - 45, 20, 0, Math.PI * 2);
+   ctx.fill();
+   ctx.stroke();
+   text(n.kind === 'shaman' ? '🔮' : (n.kind === 'thaidessert' ? '🍡' : (n.kind === 'fisherman' ? '🎣' : (n.kind === 'elder' ? '⛏️' : '🪙'))), x, y - 40, 16);
+   ctx.restore();
+  }
+
+  if(n.kind==='farmer' && quest.readyToComplete && !quest.done){
+   ctx.save();ctx.fillStyle='#f5d18a';ctx.strokeStyle='#57402b';ctx.lineWidth=2;
+   ctx.fillRect(x-10, y-48, 20, 16);ctx.strokeRect(x-10, y-48, 20, 16);
+   text('📜', x, y-36, 10);ctx.restore();
+  }
+  if(n.kind==='boonnark' && boonnarkQuest.readyToComplete && !boonnarkQuest.done){
+   ctx.save();ctx.fillStyle='#f5d18a';ctx.strokeStyle='#57402b';ctx.lineWidth=2;
+   ctx.fillRect(x-10, y-48, 20, 16);ctx.strokeRect(x-10, y-48, 20, 16);
+   text('📜', x, y-36, 10);ctx.restore();
+  }
+  if(n.kind==='shamanapprentice' && ((shamanQuest.accepted && shamanQuest.metShaman && !shamanQuest.readyToComplete && !shamanQuest.done) || (!shamanQuest.accepted))){
+   ctx.save();ctx.fillStyle='#f5d18a';ctx.strokeStyle='#57402b';ctx.lineWidth=2;
+   ctx.fillRect(x-10, y-48, 20, 16);ctx.strokeRect(x-10, y-48, 20, 16);
+   text('📜', x, y-36, 10);ctx.restore();
+  }
+ }
+
+ const exits = mapName==='หมู่บ้าน' ? [
+  ['ทุ่งนา', map.w*TILE/2, 18],
+  ['ป่าร้าง', map.w*TILE-18, map.h*TILE/2],
+  ['ไร่ซาก', 18, map.h*TILE/2],
+  ['วัดเก่า', map.w*TILE/2, map.h*TILE-18]
+ ] : mapName==='ทุ่งนา' ? [
+  ['หมู่บ้าน', map.w*TILE/2, map.h*TILE-18],
+  ['ป่าท้ายหมู่บ้าน', map.w-18, map.h*TILE/2]
+ ] : mapName==='ป่าร้าง' ? [
+  ['หมู่บ้าน', 18, map.h*TILE/2],
+  ['ป่าท้ายหมู่บ้าน', map.w*TILE/2, map.h*TILE-18],
+  ['ดงพญาไฟ', map.w*TILE/2, 18]
+ ] : mapName==='ดงพญาไฟ' ? [
+  ['ป่าร้าง', map.w*TILE/2, map.h*TILE-18]
+ ] : [
+  ['หมู่บ้าน', map.w*TILE/2, 18],
+  ['ป่าท้ายหมู่บ้าน', map.w*TILE/2, map.h*TILE-18]
+ ];
+
+ for(const [nm,x,y]of exits){let px=x-cam.x,py=y-cam.y;if(px>-50&&px<W+50&&py>-30&&py<H+30){rect(px-27,py-8,54,16,'#64462c');text('➜ '+nm,px,py+4,9,'#fff0a8')}}
+
+ if(currentTimeState === 'ช่วงเย็น'){
+  rect(0, 0, W, H, 'rgba(255, 120, 20, 0.25)');
+ } else if(currentTimeState === 'กลางคืน'){
+  rect(0, 0, W, H, 'rgba(0, 0, 0, 0.6)');
+ }
+}
+
+function mobName(t){return t==='crab'?'ปูนา':t==='ghost'?'ผีป่า':t==='spider'?'แมงมุม':t==='bigspider'?'แมงมุมยักษ์':t==='ghostboar'?'ผีหมูป่า':'หมูป่า'}
+function drawMob(m){
+ if(m.type==='ghost' && currentTimeState !== 'กลางคืน') return;
+ if(!m.alive)return;
+ let x=Math.round(m.x-cam.x),y=Math.round(m.y-cam.y);ctx.save();ctx.translate(x,y);rect(-12,7,24,4,'rgba(18,14,13,.22)');
+ if(m.type==='crab'){
+  rect(-8,-5,16,10,'#bd583a');rect(-10,-3,4,6,'#e47b4c');rect(6,-3,4,6,'#e47b4c');rect(-5,-7,3,3,'#fff');rect(2,-7,3,3,'#fff');rect(-4,-6,2,2,'#211b16');rect(3,-6,2,2,'#211b16');
+ } else if(m.type==='ghost'){
+  ctx.fillStyle='#b5d9d1';ctx.strokeStyle='#496a66';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-2,9,Math.PI,0);ctx.lineTo(9,7);ctx.lineTo(4,4);ctx.lineTo(0,8);ctx.lineTo(-4,4);ctx.lineTo(-9,7);ctx.closePath();ctx.fill();ctx.stroke();rect(-4,-4,2,3,'#263a39');rect(3,-4,2,3,'#263a39');
+ } else if(m.type==='spider'){
+  ctx.fillStyle='#2b222a';ctx.strokeStyle='#140f13';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(0,0,8,0,Math.PI*2);ctx.fill();ctx.stroke();
+  pathLine(-10,-6,-4,-2,2,'#2b222a');pathLine(-4,-2,10,-6,2,'#2b222a');
+  pathLine(-10,2,-4,2,2,'#2b222a');pathLine(-4,2,10,2,2,'#2b222a');
+  rect(-2,-4,2,2,'#ff3333');rect(1,-4,2,2,'#ff3333');
+ } else if(m.type==='bigspider'){
+  ctx.save(); ctx.scale(1.5, 1.5);
+  ctx.fillStyle='#3d1f35'; ctx.strokeStyle='#1a0d16'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(0,0,10,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  pathLine(-12,-8,-5,-3,2,'#3d1f35'); pathLine(-5,-3,12,-8,2,'#3d1f35');
+  pathLine(-12,3,-5,3,2,'#3d1f35'); pathLine(-5,3,12,3,2,'#3d1f35');
+  rect(-3,-5,2.5,2.5,'#ffcc00'); rect(1,-5,2.5,2.5,'#ffcc00');
+  ctx.restore();
+ } else if(m.type==='ghostboar'){
+  ctx.save(); ctx.scale(1.4, 1.4);
+  rect(-9,-5,18,10,'#4a2424');rect(-6,-9,11,8,'#612b2b');rect(2,-9,4,3,'#ff3333');rect(3,-8,2,2,'#000');rect(-7,4,4,5,'#2b1313');rect(4,4,4,5,'#2b1313');
+  ctx.restore();
+ } else {
+  rect(-9,-5,18,10,'#785137');rect(-6,-9,11,8,'#8c6241');rect(2,-9,4,3,'#fff');rect(3,-8,2,2,'#222');rect(-7,4,4,5,'#533923');rect(4,4,4,5,'#533923');
+ }
+ let barW = m.type==='bigspider'||m.type==='ghostboar' ? 36 : 26;
+ if(m.hp<m.maxhp){rect(-barW/2,-18,barW,4,'#3a211b');rect(-barW/2,-17,(barW-2)*Math.max(0,m.hp/m.maxhp),2,'#e74b43')}
+ text(mobName(m.type),0,-23,9,'#fff0bb');ctx.restore()}
+
+function drawPlayer(){
+  let x=Math.round(player.x-cam.x), y=Math.round(player.y-cam.y);
+  const moving = !!playerMoving;
+  
+  const swing = moving ? Math.sin(walkPhase) * 4.2 : 0;
+  const bob = moving ? Math.abs(Math.sin(walkPhase * 2)) * 2.2 : 0;
+  const bodyTilt = moving ? Math.sin(walkPhase) * 0.05 : 0;
+
+  ctx.save();
+  ctx.translate(x, Math.round(y - bob));
+  ctx.rotate(bodyTilt);
+
+  rect(-10, 8 + bob, 20, 4, 'rgba(20,18,12,.28)');
+
+  rect(-7, 2 + swing, 5, 7, '#30251f');
+  rect(2, 2 - swing, 5, 7, '#30251f');
+  rect(-7, 1 + swing, 5, 3, '#6f4a2b');
+  rect(2, 1 - swing, 5, 3, '#6f4a2b');
+
+  ctx.save();
+  ctx.translate(0, moving ? Math.sin(walkPhase * 2) * 0.8 : 0);
+  rect(-7, -5, 14, 9, '#394e75');
+  rect(-6, -3, 4, 5, '#5879a7');
+  rect(2, -3, 4, 5, '#5879a7');
+  rect(-9, -15, 18, 12, '#245b91');
+  rect(-7, -14, 14, 10, '#3d82b6');
+
+  rect(-11, -13 - swing, 4, 9, '#2c6798');
+  rect(7, -13 + swing, 4, 9, '#2c6798');
+
+  rect(-8, -5, 16, 2, '#d5a64f');
+  rect(-2, -5, 4, 2, '#f5d783');
+
+  rect(-6, -24, 12, 10, '#eab98a');
+  rect(-7, -25, 14, 4, '#211b19');
+  rect(-7, -23, 3, 7, '#211b19');
+  rect(4, -23, 3, 7, '#211b19');
+  rect(-5, -28, 10, 4, '#30221d');
+  rect(-3, -29, 7, 3, '#30221d');
+  rect(-3, -20, 2, 2, '#2a201b');
+  rect(3, -20, 2, 2, '#2a201b');
+  rect(-1, -16, 3, 1, '#a75f47');
+  rect(3, -14, 2, 7, '#c79b54');
+  rect(3, -10, 2, 2, '#ffe09a');
+  ctx.restore();
+
+  if(Date.now() - lastAttack < 180){
+   rect(8, -10, 3, 13, '#6b4527');
+   rect(9, -15, 3, 9, '#d9e4e8');
+   rect(10, -18, 2, 5, '#fff4c0');
+   pathLine(9, -14, 21, -24, 2, '#fff3b0');
+   pathLine(12, -11, 24, -20, 1, '#f9d46d');
+  }
+
+  ctx.restore();
+  text(player.name, x, y - 36, 10, '#fff1b5');
+}
+
+function nearbyNPC(){const list=getNPCs();return list.filter(n=>dist(player,n)<58).sort((a,b)=>dist(player,a)-dist(player,b))[0]}
+function nearbyMob(){return mobs.filter(m=>m.alive && (m.type!=='ghost'||currentTimeState==='กลางคืน') && dist(player,m)<48).sort((a,b)=>dist(player,a)-dist(player,b))[0]}
+function attackingMob(){return mobs.filter(m=>m.alive && (m.type!=='ghost'||currentTimeState==='กลางคืน') && m.attackingPlayer && dist(player,m)<80).sort((a,b)=>dist(player,a)-dist(player,b))[0]}
+
+function attack(targetOverride=null){
+ const now=Date.now();if(now-lastAttack<500)return;
+ const m=targetOverride||attackingMob()||nearbyMob();if(!m)return;
+ lastAttack=now;
+ playSoundAttack();
+ 
+ let baseDmg = player.damage + (player.equippedTako ? 10 : 0) + (player.equippedTusk ? 30 : 0);
+ let finalDmg = baseDmg;
+ 
+ if(player.equippedTako){
+  killCountForCrit++;
+  if(killCountForCrit >= requiredKillsForCrit){
+   finalDmg = 200;
+   notify('Critical!');
+   killCountForCrit = 0;
+   requiredKillsForCrit = Math.floor(rand(7, 11));
+  }
+ }
+
+ m.hp -= finalDmg;
+
+ if(m.hp<=0){
+  m.alive=false;
+  let expGain = m.type==='ghost'? 10 : m.type==='spider'? 20 : m.type==='bigspider'? 25 : m.type==='ghostboar'? 100 : m.type==='boar'? 7 : 5;
+  player.exp += expGain;
+  player.coins += m.type==='crab'?2:4;
+  
+  function getScatterCoord(mx, my){
+   let angle = Math.random() * Math.PI * 2;
+   let distance = rand(20, 45);
+   return {
+    x: Math.max(15, Math.min(map.w*TILE - 15, mx + Math.cos(angle) * distance)),
+    y: Math.max(15, Math.min(map.h*TILE - 15, my + Math.sin(angle) * distance))
+   };
+  }
+
+  if(m.type==='crab'){
+   items['ปูนา']++;
+   if(Math.random()<0.4){
+    let isGold = Math.random()<0.15;
+    let itemName = isGold ? 'ก้ามปูทองคำ' : 'ก้ามปู';
+    let sc = getScatterCoord(m.x, m.y);
+    floorItems.push({ x: sc.x, y: sc.y, name: itemName, isGold: isGold });
+   }
+   if(quest.accepted&&!quest.readyToComplete&&!quest.done){
+    if(quest.crabs<10) quest.crabs++;
+    if(quest.crabs>=10){quest.readyToComplete=true;notify('จับปูนาครบ 10 ตัวแล้ว! กลับไปหาลุงชาวนา');}
+    else {notify('จับปูนาได้ '+quest.crabs+'/10 ตัว');}
+   }
+  } else if(m.type==='spider'){
+   if(Math.random()<0.5){
+    let isPoisonFang = Math.random()<0.2;
+    let itemName = isPoisonFang ? 'เขี้ยวพิษ' : 'ใยแมงมุม';
+    let sc = getScatterCoord(m.x, m.y);
+    floorItems.push({ x: sc.x, y: sc.y, name: itemName, isGold: isPoisonFang });
+   }
+  } else if(m.type==='bigspider'){
+   if(Math.random()<0.6){
+    let sc = getScatterCoord(m.x, m.y);
+    floorItems.push({ x: sc.x, y: sc.y, name: 'เขี้ยวพิษสีทอง', isGold: true });
+   }
+  } else if(m.type==='ghostboar'){
+   if(Math.random()<0.6){
+    let sc = getScatterCoord(m.x, m.y);
+    floorItems.push({ x: sc.x, y: sc.y, name: 'เขี้ยวตัน', isGold: true });
+   }
+  } else if(m.type==='ghost'){
+   if(Math.random()<0.45){
+    let isGold = Math.random()<0.12;
+    let itemName = isGold ? 'ผ้าคลุมผีสีทอง' : 'ผ้าคลุมผี';
+    let sc = getScatterCoord(m.x, m.y);
+    floorItems.push({ x: sc.x, y: sc.y, name: itemName, isGold: isGold });
+   }
+   if(currentTimeState==='กลางคืน'){
+    if(boonnarkQuest.accepted&&!boonnarkQuest.readyToComplete&&!boonnarkQuest.done){
+     if(boonnarkQuest.ghosts<15) boonnarkQuest.ghosts++;
+     if(boonnarkQuest.ghosts>=15){
+      boonnarkQuest.readyToComplete=true;
+      notify(' ปราบผีป่าครบ 15 ตัวแล้ว! กลับไปหาบุญรอดที่หมู่บ้าน');
+     } else {
+      notify('ปราบผีป่าได้ '+boonnarkQuest.ghosts+'/15 ตัว');
+     }
+    }
+   }
+  } else if(m.type==='boar'){
+   if(Math.random()<0.5){
+    let meatOrSkin = Math.random()<0.5;
+    let itemName = meatOrSkin ? 'เนื้อหมูป่า' : 'หนังหมูป่า';
+    let sc = getScatterCoord(m.x, m.y);
+    floorItems.push({ x: sc.x, y: sc.y, name: itemName, isGold: false });
+   }
+  }
+
+  if(player.exp >= player.lv * 100){
+   player.exp -= player.lv * 100;
+   player.lv++;
+   pendingPoints = 3;
+   levelUpOpen = true;
+   document.getElementById('uptext').textContent = `เลือกอัปเกรดค่าพลัง (เหลือ ${pendingPoints} แต้ม)`;
+   document.getElementById('levelupmenu').style.display = 'block';
+   notify('เลเวลอัป! Lv.' + player.lv);
+  }
+
+  updateHUD();
+  updateQuestUI();
+ }
+}
+
+function updateHUD(){
+ document.getElementById('hptext').textContent=Math.ceil(player.hp)+'/'+player.maxhp;
+ document.getElementById('foodtext').textContent=Math.ceil(player.food)+'/'+player.maxfood;
+ document.getElementById('exptext').textContent=player.exp+'/'+player.lv*100;
+ document.getElementById('hpbar').style.width=100*player.hp/player.maxhp+'%';
+ document.getElementById('foodbar').style.width=100*player.food/player.maxfood+'%';
+ document.getElementById('xpbar').style.width=100*player.exp/(player.lv*100)+'%';
+ document.getElementById('lv').textContent='Lv.'+player.lv;
+ document.getElementById('coins').textContent=player.coins;
+ let totalDmg = player.damage + (player.equippedTako ? 10 : 0) + (player.equippedTusk ? 30 : 0);
+ let bonusStr = '';
+ if(player.equippedTako) bonusStr += ' +10';
+ if(player.equippedTusk) bonusStr += ' +30';
+ document.getElementById('dmgtext').textContent = totalDmg + (bonusStr ? ` (${bonusStr.trim()})` : '');
+ updateShortcutUI();
+}
+
+document.getElementById('uphpbtn').onclick=()=>{
+ if(pendingPoints > 0){
+  player.maxhp += 2;
+  player.hp = player.maxhp;
+  pendingPoints--;
+  document.getElementById('uptext').textContent = `เลือกอัปเกรดค่าพลัง (เหลือ ${pendingPoints} แต้ม)`;
+  updateHUD();
+  if(pendingPoints <= 0){
+   document.getElementById('levelupmenu').style.display = 'none';
+   levelUpOpen = false;
+   notify('อัปเกรดค่าพลังสำเร็จ!');
+  }
+ }
+};
+
+document.getElementById('upfoodbtn').onclick=()=>{
+ if(pendingPoints > 0){
+  player.maxfood += 2;
+  player.food = player.maxfood;
+  pendingPoints--;
+  document.getElementById('uptext').textContent = `เลือกอัปเกรดค่าพลัง (เหลือ ${pendingPoints} แต้ม)`;
+  updateHUD();
+  if(pendingPoints <= 0){
+   document.getElementById('levelupmenu').style.display = 'none';
+   levelUpOpen = false;
+   notify('อัปเกรดค่าพลังสำเร็จ!');
+  }
+ }
+};
+
+document.getElementById('updmgbtn').onclick=()=>{
+ if(pendingPoints > 0){
+  player.damage += 2;
+  pendingPoints--;
+  document.getElementById('uptext').textContent = `เลือกอัปเกรดค่าพลัง (เหลือ ${pendingPoints} แต้ม)`;
+  updateHUD();
+  if(pendingPoints <= 0){
+   document.getElementById('levelupmenu').style.display = 'none';
+   levelUpOpen = false;
+   notify('อัปเกรดพลังโจมตีสำเร็จ!');
+  }
+ }
+};
+
+function updateQuestUI(){
+ const qEl = document.getElementById('quest');
+ const qTitle = document.getElementById('questtitle');
+ const qText = document.getElementById('questtext');
+
+ if(quest.accepted && !quest.done){
+  qEl.style.display = 'block';
+  qTitle.textContent = 'เควส: ปูนาเต็มข้อง';
+  if(quest.readyToComplete) qText.textContent = 'กลับไปหาลุงชาวนาเพื่อส่งเควส!';
+  else qText.textContent = `จับปูนา: ${quest.crabs}/10 ตัว`;
+ } else if(boonnarkQuest.accepted && !boonnarkQuest.done){
+  qEl.style.display = 'block';
+  qTitle.textContent = 'เควส: ปราบผี';
+  if(boonnarkQuest.readyToComplete) qText.textContent = 'กลับไปหาบุญรอดเพื่อส่งเควส!';
+  else qText.textContent = `ปราบผีป่า: ${boonnarkQuest.ghosts}/15 ตัว (วัดเก่า)`;
+ } else if(shamanQuest.accepted && !shamanQuest.done){
+  qEl.style.display = 'block';
+  qTitle.textContent = 'เควส: ส่งตะกรุดหมอผี';
+  if(shamanQuest.readyToComplete) qText.textContent = 'กลับไปหาลูกศิษย์หมอผีเพื่อรับรางวัล!';
+  else if(shamanQuest.metShaman) qText.textContent = 'นำตะกรุดไปส่งหมอผีที่วัดเก่าแล้ว กลับไปหาลูกศิษย์';
+  else qText.textContent = 'นำตะกรุดไปให้หมอผีที่วัดเก่า';
+ } else {
+  qEl.style.display = 'none';
+ }
+}
+
+function openDialog(){
+ const n=nearbyNPC();
+ if(!n){notify('เข้าใกล้ NPC ก่อน');return}
+ dialogOpen=true;
+ document.getElementById('dialog').style.display='block';
+ document.getElementById('dialogtitle').textContent=n.name;
+ 
+ const farmer=n.kind==='farmer';
+ const boonnark=n.kind==='boonnark';
+ const merchant=n.kind==='merchant';
+ const elder=n.kind==='elder';
+ const hunter=n.kind==='hunter';
+ const shaman=n.kind==='shaman';
+ const shamanapprentice=n.kind==='shamanapprentice';
+ const thaidessert=n.kind==='thaidessert';
+ const fisherman=n.kind==='fisherman';
+
+ const shopBtnDialog = document.getElementById('shopbtn-dialog');
+ shopBtnDialog.style.display = 'none';
+
+ if(elder){
+  document.getElementById('dialogtext').textContent='ยินดีต้อนรับสู่ บ้านหนองอีเเร้ง ถ้าเจ้ายังไม่มี จอบ ข้ายังขายให้';
+  document.getElementById('accept').style.display='inline-block';
+  document.getElementById('accept').textContent='เปิดร้านค้าผู้ใหญ่บ้าน (ขายจอบ)';
+ } else if(fisherman){
+  document.getElementById('dialogtext').textContent='ข้ามีเบ็ดตกปลาเจ้าสนใจจะซื้อไหม ช่วยซื้อหน่อยข้าจะได้กลับบ้าน';
+  document.getElementById('accept').style.display='inline-block';
+  document.getElementById('accept').textContent='เปิดร้านค้าตาสม';
+ } else if(thaidessert){
+  document.getElementById('dialogtext').textContent='ร้านนี้มีเเต่ขนมอร่อยๆ เชิญเลือกซื้อได้เลยจ้า.. ตาสม ก็ยังไม่กลับมาจากหาปลา เจ้าช่วยไปตามให้ข้าที ต้องไป ป่าท้ายหมู่บ้านตอนเย็นๆถึงจะเจอ';
+  document.getElementById('accept').style.display='inline-block';
+  document.getElementById('accept').textContent='เปิดร้านขนมไทย';
+ } else if(shamanapprentice){
+  if(shamanQuest.done){
+   document.getElementById('dialogtext').textContent='ขอบใจเจ้ามากที่ช่วยจัดการธุระเรื่องตะกรุดให้';
+   document.getElementById('accept').style.display='none';
+  } else if(shamanQuest.readyToComplete){
+   document.getElementById('dialogtext').textContent='ยอดเยี่ยมมาก! เจ้าเอาตะกรุดไปส่งและกลับมาหาข้าเรียบร้อย รับรางวัล 200 บาทไปเลย';
+   document.getElementById('accept').style.display='inline-block';
+   document.getElementById('accept').textContent='ส่งเควส (รับ 200 บาท)';
+  } else if(shamanQuest.accepted){
+   document.getElementById('dialogtext').textContent='รีบเอาตะกรุดไปให้หมอผีที่วัดเก่าเถอะ อย่าไปตอนกลางคืนล่ะเพราะแกไม่อยู่';
+   document.getElementById('accept').style.display='none';
+  } else {
+   document.getElementById('dialogtext').textContent='ช่วยเอาตระกรุด ไปให้ หมอผี ที่วัดเก่าหน่อย อย่าไปตอนกลางคืนนะ เพราะเเกไม่อยู่';
+   document.getElementById('accept').style.display='inline-block';
+   document.getElementById('accept').textContent='รับเควสส่งตะกรุด';
+  }
+ } else if(shaman){
+  document.getElementById('dialogtext').textContent='ตระกรุด ลงอาคมของข้าคือของดี เจ้าอยากได้ไหม ข้าจะขายต่อให้';
+  document.getElementById('accept').style.display='inline-block';
+  document.getElementById('accept').textContent='เปิดร้านค้าหมอผี';
+  if(shamanQuest.accepted && !shamanQuest.metShaman){
+   shamanQuest.metShaman = true;
+   shamanQuest.readyToComplete = true;
+   notify('ส่งตะกรุดให้หมอผีสำเร็จ! กลับไปหาลูกศิษย์หมอผีที่หมู่บ้าน');
+   updateQuestUI();
+  }
+ } else if(farmer){
+  if(quest.done){
+   document.getElementById('dialogtext').textContent='พรานโชค ที่ไร่ซาก รับซื้อของป่าที่เจ้าหามาได้';
+   document.getElementById('accept').style.display='none';
+  } else if(quest.readyToComplete){
+   document.getElementById('dialogtext').textContent='โอ้! เจ้าจับปูนาครบ 10 ตัวแล้ว เยี่ยมมาก! รับรางวัลไปเลย';
+   document.getElementById('accept').style.display='inline-block';document.getElementById('accept').textContent='ส่งเควส (รับรางวัล)';
+  } else if(quest.accepted){
+   document.getElementById('dialogtext').textContent=`จับปูนาได้ ${quest.crabs}/10 ตัวแล้ว ลุยต่อไป!`;
+   document.getElementById('accept').style.display='none';
+  } else {
+   document.getElementById('dialogtext').textContent='ช่วยจับปูนา 10 ตัวจากทุ่งนาให้ลุงหน่อย ได้ค่าตอบแทน 100 บาท!';
+   document.getElementById('accept').style.display='inline-block';document.getElementById('accept').textContent='รับเควส';
+  }
+ } else if(boonnark){
+  if(boonnarkQuest.readyToComplete){
+   document.getElementById('dialogtext').textContent='จัดการผีป่าหมดแล้วสินะ! เอานี่ไป 150 บาท รางวัลของเจ้า';
+   document.getElementById('accept').style.display='inline-block';document.getElementById('accept').textContent='ส่งเควส (รับ 150 บาท)';
+  } else if(currentTimeState !== 'กลางคืน'){
+   document.getElementById('dialogtext').textContent='ถ้าเจ้าอยากได้งาน ให้มาหาข้าใหม่ในตอนกลางคืน';
+   document.getElementById('accept').style.display='none';
+  } else {
+   if(boonnarkQuest.done){
+    document.getElementById('dialogtext').textContent='หมอผี อยู่ที่วัดเก่า ต้องการของที่เจ้าหามาได้ ลองไปหาเเกดู เเต่ต้องไปตอนเช้านะ';
+    document.getElementById('accept').style.display='none';
+   } else if(boonnarkQuest.accepted){
+    document.getElementById('dialogtext').textContent=`ไปจัดการผีป่าที่วัดเก่าให้ครบ 15 ตัว ตอนนี้ได้ ${boonnarkQuest.ghosts}/15 แล้ว!`;
+    document.getElementById('accept').style.display='none';
+   } else {
+    document.getElementById('dialogtext').textContent='โอ้ผู้กล้า ช่วงนี้ผีป่าที่วัดเก่าอาละวาดหนัก ช่วยไปปราบผีป่าให้ข้า 15 ตัว จะให้รางวัล 150 บาท!';
+    document.getElementById('accept').style.display='inline-block';document.getElementById('accept').textContent='รับเควส';
+   }
+  }
+ } else if(merchant){
+  document.getElementById('dialogtext').textContent='ยินดีต้อนรับ! ยาเพิ่มเลือดขวดละ 10 บาท';
+  document.getElementById('accept').style.display='inline-block';document.getElementById('accept').textContent='ซื้อยา 10 บาท';
+ } else if(hunter){
+  document.getElementById('dialogtext').textContent='เนื้อสัตว์ หรือ ของป่า ข้ารับซื้อหมดเเต่ข้าต้องการ เขี้ยวตัน ของ ผีหมูป่า ถ้าเจ้ามีเอามาขายให้ข้า';
+  document.getElementById('accept').style.display='none';
+  shopBtnDialog.style.display = 'inline-block';
+  shopBtnDialog.onclick = () => {
+   document.getElementById('dialog').style.display='none';
+   dialogOpen=false;
+   openShopMenu('hunter');
+  };
+ } else {
+  document.getElementById('dialogtext').textContent='ยินดีต้อนรับสู่หมู่บ้านบ้านทุ่ง ออกสำรวจตามป้ายได้เลย';
+  document.getElementById('accept').style.display='none';
+ }
+
+ document.getElementById('accept').onclick=()=>{
+  if(elder){
+   document.getElementById('dialog').style.display='none';
+   dialogOpen=false;
+   openShopMenu('elder');
+  } else if(fisherman){
+   document.getElementById('dialog').style.display='none';
+   dialogOpen=false;
+   openShopMenu('fisherman');
+  } else if(thaidessert){
+   document.getElementById('dialog').style.display='none';
+   dialogOpen=false;
+   openShopMenu('thaidessert');
+  } else if(shaman){
+   document.getElementById('dialog').style.display='none';
+   dialogOpen=false;
+   openShopMenu('shaman');
+  } else if(shamanapprentice){
+   if(shamanQuest.readyToComplete && !shamanQuest.done){
+    shamanQuest.done = true;
+    player.coins += 200;
+    player.exp += 60;
+    notify('🎉 ส่งเควสลูกศิษย์หมอผีสำเร็จ! รับ 200 บาท และ EXP 60');
+    updateHUD();
+    updateQuestUI();
+   } else if(!shamanQuest.accepted){
+    shamanQuest.accepted = true;
+    notify('รับเควส "ส่งตะกรุด" แล้ว!');
+    updateQuestUI();
+   }
+  } else if(merchant){
+   if(player.coins>=10){player.coins-=10;items['ยาเพิ่มเลือด']++;notify('ซื้อยาเพิ่มเลือดแล้ว')}else notify('เงินไม่พอ');
+   updateHUD();
+  } else if(farmer){
+   if(quest.readyToComplete && !quest.done){
+    quest.done=true;player.coins+=100;player.exp+=50;
+    notify('🎉 ส่งเควสสำเร็จ! รับ 100 บาท และ EXP 50');
+    updateHUD();updateQuestUI();
+   } else if(!quest.accepted){
+    quest.accepted=true;notify('รับเควสลุงชาวนาแล้ว!');updateQuestUI();
+   }
+  } else if(boonnark){
+   if(boonnarkQuest.readyToComplete && !boonnarkQuest.done){
+    boonnarkQuest.done=true;player.coins+=150;player.exp+=80;
+    notify('🎉 ส่งเควสบุญรอดสำเร็จ! รับ 150 บาท และ EXP 80');
+    updateHUD();updateQuestUI();
+   } else if(!boonnarkQuest.accepted && currentTimeState === 'กลางคืน'){
+    boonnarkQuest.accepted=true;notify('รับเควส "ปราบผี" จากบุญรอดแล้ว!');updateQuestUI();
+   }
+  }
+  if(!shaman && !thaidessert && !fisherman && !hunter && !shamanapprentice && !elder){
+   document.getElementById('dialog').style.display='none';dialogOpen=false;
+  } else if(shaman){
+   document.getElementById('dialog').style.display='none';
+   dialogOpen=false;
+   openShopMenu('shaman');
+  } else if(elder){
+   document.getElementById('dialog').style.display='none';
+   dialogOpen=false;
+   openShopMenu('elder');
+  }
+ }
+}
+
+function closeDialog(){document.getElementById('dialog').style.display='none';dialogOpen=false}
+
+function openShopMenu(type = 'hunter'){
+ activeShopType = type;
+ shopOpen=true;
+ const el=document.getElementById('shopmenu');
+ el.style.display='block';
+ if(type === 'shaman'){
+  document.getElementById('shoptitle').textContent = 'ร้านค้าหมอผี (ซื้อ/ขายตะกรุด และรับซื้อของผี)';
+ } else if(type === 'elder'){
+  document.getElementById('shoptitle').textContent = 'ร้านค้าผู้ใหญ่บ้าน (ขายจอบ)';
+ } else if(type === 'thaidessert'){
+  document.getElementById('shoptitle').textContent = 'ร้านขนมไทยโบราณ';
+ } else if(type === 'fisherman'){
+  document.getElementById('shoptitle').textContent = 'ร้านค้าตาสม (ขายเบ็ดตกปลา)';
+ } else {
+  document.getElementById('shoptitle').textContent = 'ร้านค้าพรานโชค (รับซื้อของป่า/เนื้อสัตว์/เขี้ยวตัน/ปลาซิว)';
+ }
+ updateShopList();
+}
+
+function updateShopList(){
+ const listEl=document.getElementById('shopitemlist');
+ 
+ if(activeShopType === 'elder'){
+  let html = `
+   <div class="shop-item" style="border-color:#d6ad69;">
+    <div class="shop-item-info">
+     <b>จอบ</b>
+     <span style="color:#f5d18a">ราคา: 100 บาท</span>
+     <span style="color:#aaa">ใช้สำหรับขุดหาไส้เดือนที่ป่าท้ายหมู่บ้าน</span>
+    </div>
+    <div class="shop-item-btns">
+     <button onclick="window.buyItem('จอบ', 100)">ซื้อ</button>
+    </div>
+   </div>
+  `;
+  listEl.innerHTML = html;
+ } else if(activeShopType === 'fisherman'){
+  let html = `
+   <div class="shop-item" style="border-color:#d6ad69;">
+    <div class="shop-item-info">
+     <b>เบ็ดตกปลา</b>
+     <span style="color:#f5d18a">ราคา: 150 บาท</span>
+     <span style="color:#aaa">ใช้สำหรับตกปลาที่บ่อน้ำ (ต้องใช้ไส้เดือนหรือปูนาเป็นเหยื่อ)</span>
+    </div>
+    <div class="shop-item-btns">
+     <button onclick="window.buyItem('เบ็ดตกปลา', 150)">ซื้อ</button>
+    </div>
+   </div>
+  `;
+  listEl.innerHTML = html;
+ } else if(activeShopType === 'thaidessert'){
+  let html = `
+   <div class="shop-item" style="border-color:#d6ad69;">
+    <div class="shop-item-info">
+     <b>ข้าวต้มมัด</b>
+     <span style="color:#f5d18a">ราคา: 10 บาท</span>
+     <span style="color:#aaa">เพิ่มความอิ่ม 10%</span>
+    </div>
+    <div class="shop-item-btns">
+     <button onclick="window.buyItem('ข้าวต้มมัด', 10)">ซื้อ</button>
+    </div>
+   </div>
+   <div class="shop-item" style="border-color:#d6ad69;">
+    <div class="shop-item-info">
+     <b>ขนมต้ม</b>
+     <span style="color:#f5d18a">ราคา: 20 บาท</span>
+     <span style="color:#aaa">เพิ่มความอิ่ม 20%</span>
+    </div>
+    <div class="shop-item-btns">
+     <button onclick="window.buyItem('ขนมต้ม', 20)">ซื้อ</button>
+    </div>
+   </div>
+   <div class="shop-item" style="border-color:#d6ad69;">
+    <div class="shop-item-info">
+     <b>บัวลอย</b>
+     <span style="color:#f5d18a">ราคา: 25 บาท</span>
+     <span style="color:#aaa">เพิ่มความอิ่ม 25%</span>
+    </div>
+    <div class="shop-item-btns">
+     <button onclick="window.buyItem('บัวลอย', 25)">ซื้อ</button>
+    </div>
+   </div>
+   <div class="shop-item" style="border-color:#d6ad69;">
+    <div class="shop-item-info">
+     <b>บัวลอยไข่หวาน</b>
+     <span style="color:#f5d18a">ราคา: 50 บาท</span>
+     <span style="color:#aaa">เพิ่มความอิ่ม 50%</span>
+    </div>
+    <div class="shop-item-btns">
+     <button onclick="window.buyItem('บัวลอยไข่หวาน', 50)">ซื้อ</button>
+    </div>
+   </div>
+  `;
+  listEl.innerHTML = html;
+
+ } else if(activeShopType === 'shaman'){
+  let html = '';
+  html += `
+   <div class="shop-item" style="border-color:#d6ad69;">
+    <div class="shop-item-info">
+     <b>ตะกรุดลงอาคม</b>
+     <span style="color:#f5d18a">ราคาซื้อ: 500 บาท</span>
+     <span style="color:#aaa">เพิ่มดาเมจ +10 (สะสมฆ่ามอน 7-10 ตัว ติดคิ 200 ดาเมจ)</span>
+    </div>
+    <div class="shop-item-btns">
+     <button onclick="window.buyItem('ตะกรุดลงอาคม', 500)">ซื้อ</button>
+    </div>
+   </div>
+   <hr style="border-color:#433326;margin:10px 0;">
+   <div style="font-size:11px;color:#ffe7a3;margin-bottom:6px;"><b>ขายตะกรุดคืน หรือ ขายของผี:</b></div>
+  `;
+
+  let shamanSellItems = ['ตะกรุดลงอาคม', 'ผ้าคลุมผี', 'ผ้าคลุมผีสีทอง', 'ใยแมงมุม', 'เขี้ยวพิษ', 'เขี้ยวพิษสีทอง'];
+  let availableShamanItems = shamanSellItems.filter(itemName => (items[itemName] || 0) > 0);
+
+  if(availableShamanItems.length === 0){
+   html += '<div style="text-align:center; padding: 10px; color: #aaa;">ไม่มีไอเทมสำหรับขายให้หมอผี</div>';
+  } else {
+   html += availableShamanItems.map(itemName => {
+    let count = items[itemName] || 0;
+    let price = itemPrices[itemName];
+    return `
+     <div class="shop-item">
+      <div class="shop-item-info">
+       <b>${itemName}</b>
+       <span style="color:#f5d18a">ราคาขาย: ${price} บาท</span>
+       <span style="color:#aaa">มี: ${count} ชิ้น</span>
+      </div>
+      <div class="shop-item-btns">
+       <button onclick="window.sellItem('${itemName}', 1)">ขาย 1</button>
+       <button onclick="window.sellItem('${itemName}', ${count})">ขายทั้งหมด</button>
+      </div>
+     </div>
+    `;
+   }).join('');
+  }
+  listEl.innerHTML = html;
+
+ } else {
+  const sellableItems = ['มะม่วง', 'ข้าวต้มมัด', 'ขนมต้ม', 'บัวลอย', 'บัวลอยไข่หวาน', 'หนังหมูป่า', 'เนื้อหมูป่า', 'เขี้ยวตัน', 'ปูนา', 'ก้ามปู', 'ก้ามปูทองคำ', 'ใยแมงมุม', 'เขี้ยวพิษ', 'เขี้ยวพิษสีทอง', 'ปลาหมอ', 'ปลาซิว'];
+  let availableSellItems = sellableItems.filter(itemName => (items[itemName] || 0) > 0);
+
+  if(availableSellItems.length === 0){
+   listEl.innerHTML = '<div style="text-align:center; padding: 20px; color: #aaa;">ไม่มีไอเทมสำหรับขายให้พราน</div>';
+  } else {
+   listEl.innerHTML = availableSellItems.map(itemName => {
+    let count = items[itemName] || 0;
+    let price = itemPrices[itemName] || 5;
+    return `
+     <div class="shop-item">
+      <div class="shop-item-info">
+       <b>${itemName}</b>
+       <span style="color:#f5d18a">ราคา: ${price} บาท</span>
+       <span style="color:#aaa">มี: ${count} ชิ้น</span>
+      </div>
+      <div class="shop-item-btns">
+       <button onclick="window.sellItem('${itemName}', 1)">ขาย 1</button>
+       <button onclick="window.sellItem('${itemName}', ${count})">ขายทั้งหมด</button>
+      </div>
+     </div>
+    `;
+   }).join('');
+  }
+ }
+}
+
+window.buyItem = (itemName, price) => {
+ if(player.coins >= price){
+  player.coins -= price;
+  if(items[itemName] === undefined) items[itemName] = 0;
+  items[itemName]++;
+  notify(`🎁 ซื้อ ${itemName} เข้ากระเป๋าสำเร็จ!`);
+  updateHUD();
+  updateShopList();
+ } else {
+  notify('❌ เงินไม่พอซื้อไอเทมนี้');
+ }
+};
+
+window.sellItem=(itemName, amount)=>{
+ if(items[itemName] >= amount && amount > 0){
+  items[itemName] -= amount;
+  let earned = amount * (itemPrices[itemName] || 5);
+  player.coins += earned;
+  notify(`💰 ขาย ${itemName} ${amount} ชิ้น ได้รับ ${earned} บาท`);
+  updateHUD();
+  updateShopList();
+ } else {
+  notify('จำนวนไอเทมไม่เพียงพอ');
+ }
+};
+
+document.getElementById('shopclose').onclick=()=>{
+ document.getElementById('shopmenu').style.display='none';
+ shopOpen=false;
+};
+
+canvas.addEventListener('pointerdown', (e)=>{
+ let rect = canvas.getBoundingClientRect();
+ let clickX = e.clientX - rect.left;
+ let clickY = e.clientY - rect.top;
+
+ const currentNPCs = getNPCs();
+ for(const n of currentNPCs){
+  if((n.kind === 'hunter' || n.kind === 'shaman' || n.kind === 'thaidessert' || n.kind === 'fisherman' || n.kind === 'elder') && dist(player, n) < 58){
+   let nx = n.x - cam.x;
+   let ny = n.y - cam.y - 45;
+   if(Math.hypot(clickX - nx, clickY - ny) < 25){
+    openShopMenu(n.kind === 'shaman' ? 'shaman' : (n.kind === 'thaidessert' ? 'thaidessert' : (n.kind === 'fisherman' ? 'fisherman' : (n.kind === 'elder' ? 'elder' : 'hunter'))));
+    break;
+   }
+  }
+ }
+});
+
+function openMapMenu(){
+ const names=Object.keys(maps).filter(name => name !== 'ดงพญาไฟ');
+ const container=document.getElementById('maplistcontainer');
+ container.innerHTML='';
+ names.forEach(name=>{
+  if(name===mapName) return;
+  let btn=document.createElement('button');
+  btn.className='map-list-btn';
+  btn.textContent=' นำทางไป: '+name;
+  btn.onclick=()=>{
+   navigatingTarget=name;
+   document.getElementById('mapmenu').style.display='none';
+   dialogOpen=false;
+   notify('เริ่มนำทางไปยัง '+name);
+  };
+  container.appendChild(btn);
+ });
+ document.getElementById('mapmenu').style.display='block';
+ dialogOpen=true;
+}
+
+document.getElementById('mapclose').onclick=()=>{
+ document.getElementById('mapmenu').style.display='none';
+ dialogOpen=false;
+};
+
+function toggleInventory(forceSelectShortcut = false){
+ const el=document.getElementById('inventory');
+ if(el.style.display==='block'){
+  el.style.display='none';
+ } else {
+  el.style.display='block';
+  const listEl=document.getElementById('itemlist');
+  let filteredItems = Object.entries(items).filter(([k, v]) => v > 0);
+
+  if(filteredItems.length === 0){
+   listEl.innerHTML = '<div style="grid-column: span 3; text-align:center; padding: 20px; color: #aaa;">กระเป๋าว่างเปล่า</div>';
+  } else {
+   listEl.innerHTML = filteredItems.map(([k,v])=>`
+    <div class="inv-slot">
+     <div><b>${k}</b><br><span style="color:#f5d18a">มี: ${v}</span></div>
+     ${k==='ยาเพิ่มเลือด' ? `<button onclick="window.usePotion()">ใช้งาน</button>` : ''}
+     ${k==='มะม่วง' ? `<button onclick="window.eatMango()">กิน</button>` : ''}
+     ${k==='ข้าวต้มมัด' ? `<button onclick="window.eatThaiDessert('ข้าวต้มมัด', 10)">กิน</button>` : ''}
+     ${k==='ขนมต้ม' ? `<button onclick="window.eatThaiDessert('ขนมต้ม', 20)">กิน</button>` : ''}
+     ${k==='บัวลอย' ? `<button onclick="window.eatThaiDessert('บัวลอย', 25)">กิน</button>` : ''}
+     ${k==='บัวลอยไข่หวาน' ? `<button onclick="window.eatThaiDessert('บัวลอยไข่หวาน', 50)">กิน</button>` : ''}
+     ${k==='ตะกรุดลงอาคม' ? `<button onclick="window.equipTako()">${player.equippedTako ? 'ถอด' : 'สวมใส่'}</button>` : ''}
+     ${k==='เขี้ยวตัน' ? `<button onclick="window.equipTusk()">${player.equippedTusk ? 'ถอด' : 'สวมใส่'}</button>` : ''}
+     ${k==='เบ็ดตกปลา' ? `<button onclick="window.equipRod()">${player.equippedRod ? 'เก็บเบ็ด' : 'ถือเบ็ด'}</button>` : ''}
+     ${k==='จอบ' ? `<button onclick="window.equipHoe()">${player.equippedHoe ? 'เก็บจอบ' : 'ถือจอบ'}</button>` : ''}
+     ${k==='ไส้เดือน' ? `<button style="background:#793833;" onclick="window.dropAllWorms()">ทิ้งทั้งหมด</button>` : ''}
+     ${(k==='ยาเพิ่มเลือด' || k==='มะม่วง' || k==='ข้าวต้มมัด' || k==='ขนมต้ม' || k==='บัวลอย' || k==='บัวลอยไข่หวาน') ? `<button style="background:#3b5c3a;border-color:#6cb26a;" onclick="window.setShortcut('${k}')">ใส่ช่องลัด</button>` : ''}
+    </div>
+   `).join('');
+  }
+ }
+}
+
+window.setShortcut = (itemName) => {
+ shortcutItem = itemName;
+ notify(`ตั้งค่า ${itemName} ไว้ที่ปุ่มเมนูลัดแล้ว`);
+ document.getElementById('inventory').style.display = 'none';
+ updateShortcutUI();
+};
+
+window.usePotion=()=>{
+ if(items['ยาเพิ่มเลือด']>0 && player.hp < player.maxhp){
+  items['ยาเพิ่มเลือด']--;
+  player.hp = Math.min(player.maxhp, player.hp + 25);
+  notify('ฟื้นฟู HP +25');
+  updateHUD();
+  updateShortcutUI();
+  if(document.getElementById('inventory').style.display==='block'){
+   toggleInventory();
+   setTimeout(toggleInventory, 50);
+  }
+ } else {
+  notify('HP เต็มแล้ว หรือไม่มีไอเทมยา');
+ }
+};
+
+window.eatMango=()=>{
+ if(items['มะม่วง'] > 0 && player.food < player.maxfood){
+  items['มะม่วง']--;
+  player.food = Math.min(player.maxfood, player.food + 5);
+  notify('กินมะม่วง อาหาร +5%');
+  updateHUD();
+  updateShortcutUI();
+  if(document.getElementById('inventory').style.display==='block'){
+   toggleInventory();
+   setTimeout(toggleInventory, 50);
+  }
+ } else {
+  notify('หลอดอาหารเต็มแล้ว หรือไม่มีมะม่วง');
+ }
+};
+
+window.eatThaiDessert = (dessertName, percentAdd) => {
+ if(items[dessertName] > 0 && player.food < player.maxfood){
+  items[dessertName]--;
+  let addVal = (percentAdd / 100) * player.maxfood;
+  player.food = Math.min(player.maxfood, player.food + addVal);
+  notify(`กิน${dessertName} ความอิ่ม +${percentAdd}%`);
+  updateHUD();
+  updateShortcutUI();
+  if(document.getElementById('inventory').style.display==='block'){
+   toggleInventory();
+   setTimeout(toggleInventory, 50);
+  }
+ } else {
+  notify('หลอดอาหารเต็มแล้ว หรือไม่มีไอเทมนี้ในกระเป๋า');
+ }
+};
+
+window.equipTako = () => {
+ player.equippedTako = !player.equippedTako;
+ notify(player.equippedTako ? '🛡️ สวมใส่ตะกรุดลงอาคมแล้ว (พลังโจมตี +10 และสะสมฆ่ามอน 7-10 ตัวติดคิ 200)' : '🛡️ ถอดตะกรุดลงอาคมแล้ว');
+ updateHUD();
+ toggleInventory();
+ setTimeout(toggleInventory, 50);
+};
+
+window.equipTusk = () => {
+ player.equippedTusk = !player.equippedTusk;
+ notify(player.equippedTusk ? '🦷 สวมใส่เขี้ยวตันแล้ว (พลังโจมตีดาบ +30)' : '🦷 ถอดเขี้ยวตันแล้ว');
+ updateHUD();
+ toggleInventory();
+ setTimeout(toggleInventory, 50);
+};
+
+window.equipRod = () => {
+ player.equippedRod = !player.equippedRod;
+ if(player.equippedRod) player.equippedHoe = false;
+ notify(player.equippedRod ? '🎣 เตรียมพร้อมถือเบ็ดตกปลาแล้ว (เข้าใกล้บ่อน้ำเพื่อตกปลา)' : '🎣 เก็บเบ็ดตกปลาแล้ว');
+ toggleInventory();
+ setTimeout(toggleInventory, 50);
+};
+
+window.equipHoe = () => {
+ player.equippedHoe = !player.equippedHoe;
+ if(player.equippedHoe) player.equippedRod = false;
+ notify(player.equippedHoe ? '⛏️ ถือจอบแล้ว (ไปที่ป่าท้ายหมู่บ้านเพื่อขุดดินหาไส้เดือน)' : '⛏️ เก็บจอบแล้ว');
+ toggleInventory();
+ setTimeout(toggleInventory, 50);
+};
+
+window.dropAllWorms = () => {
+ let count = items['ไส้เดือน'] || 0;
+ if(count <= 0) {
+  notify('ไม่มีไส้เดือนในกระเป๋า');
+  return;
+ }
+ items['ไส้เดือน'] = 0;
+ for(let i = 0; i < count; i++){
+  let angle = Math.random() * Math.PI * 2;
+  let distance = rand(30, 80);
+  floorItems.push({
+   x: Math.max(15, Math.min(map.w*TILE - 15, player.x + Math.cos(angle) * distance)),
+   y: Math.max(15, Math.min(map.h*TILE - 15, player.y + Math.sin(angle) * distance)),
+   name: 'ไส้เดือน',
+   isGold: false
+  });
+ }
+ notify(`ทิ้งไส้เดือนลงพื้น ${count} ตัวแล้ว`);
+ toggleInventory();
+ setTimeout(toggleInventory, 50);
+};
+
+document.getElementById('digbtn').onclick = () => {
+ if(isDigging) return;
+ if(!player.equippedHoe){
+  notify('กรุณาถือจอบจากกระเป๋าก่อน');
+  return;
+ }
+ if(mapName !== 'ป่าท้ายหมู่บ้าน'){
+  notify('ต้องขุดดินที่แผนที่ "ป่าท้ายหมู่บ้าน" เท่านั้น!');
+  return;
+ }
+
+ isDigging = true;
+ notify('⛏️ กำลังขุดหาไส้เดือน...');
+ document.getElementById('digbtn').style.background = '#885522';
+ document.getElementById('digbtn').innerHTML = '<span style="font-size:14px;color:#fff;">⏳</span><span style="font-size:9px;color:#ffd6d6;">กำลังขุด...</span>';
+
+ setTimeout(() => {
+  isDigging = false;
+  document.getElementById('digbtn').style.background = '#6d4d1a';
+  document.getElementById('digbtn').innerHTML = '<span style="font-size:18px;">⛏️</span><span style="font-size:9px;color:#ffedd6;margin-top:2px;">ขุดดิน</span>';
+
+  items['ไส้เดือน']++;
+  notify('ได้รับ "ไส้เดือน" 1 ตัว');
+  updateHUD();
+ }, 3000);
+};
+
+document.getElementById('fishbtn').onclick = () => {
+ if(isFishing) return;
+ if(!player.equippedRod){
+  notify('กรุณาถือเบ็ดตกปลาจากกระเป๋าก่อน');
+  return;
+ }
+
+ let hasWorm = (items['ไส้เดือน'] || 0) > 0;
+ let hasCrab = (items['ปูนา'] || 0) > 0;
+
+ if(!hasWorm && !hasCrab){
+  notify('ต้องการเหยื่อเพื่อตกปลา ลองขุดหาเแถวนี้ดู');
+  return;
+ }
+
+ let baitUsed = '';
+ if(hasWorm){
+  items['ไส้เดือน']--;
+  baitUsed = 'ไส้เดือน';
+ } else if(hasCrab){
+  items['ปูนา']--;
+  baitUsed = 'ปูนา';
+ }
+
+ isFishing = true;
+ notify(`🎣 ใช้ ${baitUsed} เป็นเหยื่อ กำลังรอปลามาติดเบ็ด...`);
+ document.getElementById('fishbtn').style.background = '#885522';
+ document.getElementById('fishbtn').innerHTML = '<span style="font-size:14px;color:#fff;">⏳</span><span style="font-size:9px;color:#ffd6d6;">กำลังตก...</span>';
+
+ setTimeout(() => {
+  isFishing = false;
+  document.getElementById('fishbtn').style.background = '#1a4d6c';
+  document.getElementById('fishbtn').innerHTML = '<span style="font-size:18px;">🎣</span><span style="font-size:9px;color:#d6edff;margin-top:2px;">ตกปลา</span>';
+
+  if(baitUsed === 'ไส้เดือน'){
+   items['ปลาซิว']++;
+   notify('ได้รับ "ปลาซิว" 1 ตัว');
+  } else {
+   items['ปลาหมอ']++;
+   notify('ได้รับ "ปลาหมอ" 1 ตัว');
+  }
+  updateHUD();
+ }, 6000);
+};
+
+document.getElementById('talk').onclick=openDialog;
+document.getElementById('close').onclick=closeDialog;
+document.getElementById('invbtn').onclick=()=>toggleInventory(false);
+document.getElementById('bagbtn').onclick=()=>toggleInventory(false);
+document.getElementById('invclose').onclick=()=>{ document.getElementById('inventory').style.display='none'; };
+document.getElementById('mapbtn').onclick=openMapMenu;
+document.getElementById('map2').onclick=openMapMenu;
+
+const stick = document.getElementById('stick'), nub = document.getElementById('nub');
+function joyStart(e){
+ if(e.clientX > W / 2) return;
+ e.preventDefault();
+ touchJoy.active = true;touchJoy.pid = e.pointerId;touchJoy.startX = e.clientX;touchJoy.startY = e.clientY;
+ stick.style.display = 'block';stick.style.left = (e.clientX - 55) + 'px';stick.style.top = (e.clientY - 55) + 'px';
+ nub.style.left = '33px';nub.style.top = '33px';
+}
+function joyMove(e){
+ if(!touchJoy.active || e.pointerId !== touchJoy.pid) return;
+ let dx = e.clientX - touchJoy.startX;let dy = e.clientY - touchJoy.startY;let max = 40;let len = Math.hypot(dx, dy);let k = len > max ? max / len : 1;
+ touchJoy.x = (dx * k) / max;touchJoy.y = (dy * k) / max;
+ nub.style.left = (33 + dx * k) + 'px';nub.style.top = (33 + dy * k) + 'px';
+}
+function joyEnd(e){
+ if(!touchJoy.active || e.pointerId !== touchJoy.pid) return;
+ touchJoy.active = false;touchJoy.x = 0;touchJoy.y = 0;stick.style.display = 'none';
+}
+addEventListener('pointerdown', joyStart);addEventListener('pointermove', joyMove);addEventListener('pointerup', joyEnd);addEventListener('pointercancel', joyEnd);
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key===' '){e.preventDefault();attack()}if(e.key.toLowerCase()==='e')openDialog()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+
+function checkExits(){
+ let x=player.x,y=player.y,w=map.w*TILE,h=map.h*TILE;
+ if(mapName==='หมู่บ้าน'){
+  if(y<14)setMap('ทุ่งนา',w/2,h-45);
+  else if(x>w-14)setMap('ป่าร้าง',40,h/2);
+  else if(x<14)setMap('ไร่ซาก',w-40,h/2);
+  else if(y>h-14)setMap('วัดเก่า',w/2,40);
+ }else if(mapName==='ทุ่งนา'){
+  if(y>h-14)setMap('หมู่บ้าน',w/2,50);
+  else if(x>w-14)setMap('ป่าท้ายหมู่บ้าน',40,h/2);
+ }else if(mapName==='ป่าร้าง'){
+  if(x<14)setMap('หมู่บ้าน',w-50,h/2);
+  else if(y>h-14)setMap('ป่าท้ายหมู่บ้าน',w/2,40);
+  else if(y<14)setMap('ดงพญาไฟ',w/2,h-45);
+ }else if(mapName==='ดงพญาไฟ'){
+  if(y>h-14)setMap('ป่าร้าง',w/2,40);
+ }else{
+  if(y<14)setMap('หมู่บ้าน',w/2,h-50);
+  else if(y>h-14)setMap('ป่าท้ายหมู่บ้าน',w/2,40);
+ }
+}
+
+let last=performance.now();
+function loop(now){
+ let dt=Math.min((now-last)/1000,.05);last=now;
+ 
+ if(gameStarted){
+  gameTimeSeconds += dt;
+  let totalCycle = 480;
+  let tInCycle = gameTimeSeconds % totalCycle;
+  let prevState = currentTimeState;
+  
+  if(tInCycle < 120) currentTimeState = 'ช่วงเช้า';
+  else if(tInCycle < 300) currentTimeState = 'ช่วงเย็น';
+  else currentTimeState = 'กลางคืน';
+
+  if(prevState !== currentTimeState) {
+   document.getElementById('timetext').textContent = currentTimeState;
+   if(currentTimeState === 'กลางคืน') notify('🌙 ตกกลางคืนแล้ว ผีป่าออกอาละวาด!');
+   else if(currentTimeState === 'ช่วงเย็น') notify('🌇 พระอาทิตย์กำลังจะตกดิน...');
+   else if(currentTimeState === 'ช่วงเช้า') notify('☀️ แสงยามเช้า');
+  }
+
+  updateNPCsMovement(dt);
+
+  let nearPond = false;
+  if(mapName === 'ป่าท้ายหมู่บ้าน' && player.equippedRod){
+   for(const p of ponds){
+    if(dist(player, p) < p.r + 20){
+     nearPond = true;
+     break;
+    }
+   }
+  }
+  document.getElementById('fishbtn').style.display = nearPond ? 'flex' : 'none';
+  document.getElementById('digbtn').style.display = (mapName === 'ป่าท้ายหมู่บ้าน' && player.equippedHoe) ? 'flex' : 'none';
+
+  let n = nearbyNPC();
+  if(!n || (n.kind !== 'hunter' && n.kind !== 'shaman' && n.kind !== 'thaidessert' && n.kind !== 'fisherman' && n.kind !== 'elder')){
+   if(shopOpen){ document.getElementById('shopmenu').style.display='none'; shopOpen=false; }
+  }
+
+  if(!levelUpOpen){
+   player.food = Math.max(0, player.food - 0.15 * dt);
+   if(player.food <= 0){
+    player.hp = Math.max(0, player.hp - 3 * dt);
+    if(player.hp <= 0){
+     player.hp = player.maxhp;
+     player.food = player.maxfood;
+     player.x = maps['หมู่บ้าน'].w * TILE / 2;
+     player.y = maps['หมู่บ้าน'].h * TILE / 2;
+     if(mapName !== 'หมู่บ้าน') setMap('หมู่บ้าน');
+     notify('💀 หิวตาย! กลับมาเกิดใหม่ที่หมู่บ้าน');
+    }
+   }
+   updateHUD();
+
+   if(mapName === 'หมู่บ้าน'){
+    for(const mt of mangoTrees){
+     if(mt.mangos > 0 && dist(player, mt) < 32){
+      items['มะม่วง'] += mt.mangos;
+      notify(`🥭 เก็บมะม่วง ${mt.mangos} ลูกเข้ากระเป๋า`);
+      mt.mangos = 0;
+     }
+    }
+   }
+
+   if(!dialogOpen&&!shopOpen&&document.getElementById('inventory').style.display!=='block'&&document.getElementById('mapmenu').style.display!=='block'){
+    let dx=touchJoy.x+(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),dy=touchJoy.y+(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0),len=Math.hypot(dx,dy);
+    if(len>1){dx/=len;dy/=len}
+    
+    if (len > 0.05) {
+     playerMoving = true;
+     walkPhase += dt * 14;
+    } else {
+     playerMoving = false;
+     walkPhase = 0;
+    }
+    
+    let moveStep = 145 * dt;
+    let nextX = player.x + dx * moveStep;
+    let nextY = player.y + dy * moveStep;
+    
+    nextX = Math.max(8, Math.min(map.w*TILE-8, nextX));
+    let collideX = false;
+    for(const s of solids){if(Math.hypot(nextX - s.x, player.y - s.y) < (player.radius + s.r)){ collideX = true; break; }}
+    if(!collideX) player.x = nextX;
+
+    nextY = Math.max(8, Math.min(map.h*TILE-8, nextY));
+    let collideY = false;
+    for(const s of solids){if(Math.hypot(player.x - s.x, nextY - s.y) < (player.radius + s.r)){ collideY = true; break; }}
+    if(!collideY) player.y = nextY;
+
+    for(let i = floorItems.length - 1; i >= 0; i--){
+     let fi = floorItems[i];
+     if(dist(player, fi) < 30){
+      if(items[fi.name] !== undefined){
+       items[fi.name]++;
+      } else {
+       items[fi.name] = 1;
+      }
+      notify(`เก็บไอเทม: ${fi.name}แล้ว`);
+      floorItems.splice(i, 1);
+     }
+    }
+
+    for(const m of mobs){
+     if(m.type==='ghost' && currentTimeState !== 'กลางคืน') continue;
+     if(!m.alive){if(!m.respawn)m.respawn=now+10000;if(now>m.respawn){m.alive=true;m.hp=m.maxhp;m.x=rand(40,map.w*TILE-40);m.y=rand(40,map.h*TILE-40);m.respawn=0;m.attackingPlayer=false}continue}
+     let d=dist(player,m);
+     if(d<145){
+      m.aggro=true;
+      if(d>23){m.x+=(player.x-m.x)/d*42*dt;m.y+=(player.y-m.y)/d*42*dt;m.attackingPlayer=false}
+      else {
+       m.attackingPlayer=true;
+       if(now-lastMob>900){
+        let mobDmg = m.type==='crab' ? 1 : m.type==='spider' ? 5 : m.type==='bigspider' ? 15 : m.type==='ghostboar' ? 30 : m.type==='boar' ? 2 : 4;
+        player.hp=Math.max(0,player.hp - mobDmg);lastMob=now;
+        if(player.hp===0){
+         player.hp=player.maxhp;
+         player.food=player.maxfood;
+         player.x=map.w*TILE/2;player.y=map.h*TILE/2;
+         if(mapName!=='หมู่บ้าน') setMap('หมู่บ้าน');
+         notify('หมดแรง! กลับไปจุดเกิด');
+        }
+        updateHUD()
+       }
+      }
+     } else {
+      m.attackingPlayer=false;
+     }
+    }
+    
+    if(autoAttack && (attackingMob() || nearbyMob())) {
+     attack();
+    }
+    
+    checkExits();
+   }
+  }
+
+  cam.x=Math.max(0,Math.min(map.w*TILE-W,player.x-W/2));cam.y=Math.max(0,Math.min(map.h*TILE-H,player.y-H/2));
+  drawWorld();for(const m of mobs)drawMob(m);drawPlayer();
+ }
+
+ if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)document.getElementById('toast').style.display='none'}
+ requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
